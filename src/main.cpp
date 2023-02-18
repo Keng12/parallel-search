@@ -4,6 +4,7 @@
 #include <chrono>
 #include <sstream>
 #include <fstream>
+#include <thread>
 
 #include "vector.hpp"
 #include "searcher.hpp"
@@ -24,7 +25,7 @@ int main()
 
         kyc::Searcher searcher{data, condVar, mutex, searchFlag};
         std::cout << "Setup searcher" << std::endl;
-        searcher.start(2);
+        searcher.start(std::thread::hardware_concurrency() - 1);
         std::cout << "Setup searcher finished" << std::endl;
         while (true)
         {
