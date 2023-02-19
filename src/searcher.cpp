@@ -73,7 +73,7 @@ namespace kyc
                     {
                         notifyMainThread(); // Set boolean for main thread AFTER pushing back element
                     }
-                // In case final job is not final element to be processed -> Still cancel while loop
+                    // In case final job is not final element to be processed -> Still cancel while loop
                 } while (!getSearchFinished());
             };
             mThreadpool.postJob(job);
