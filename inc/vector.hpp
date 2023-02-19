@@ -36,7 +36,7 @@ namespace kyc
       }
       else
       {
-        std::cerr << "Reserve failed with n: " << n << " and mCapacity: " << mCapacity << std::endl;
+        throw std::invalid_argument{"Reserve failed with n: " << n << " and mCapacity: " << mCapacity};
       }
     }
 
@@ -77,7 +77,15 @@ namespace kyc
     void reserve(int n)
     {
       std::unique_lock<std::shared_mutex> lock{mMutex};
-      reserve_nonlocking(n);
+      // Analogue to std::vector
+      try
+      {
+        reserve_nonlocking(n);
+      }
+      catch (const std::invalid_argument &e)
+      {
+        std::cerr << e.what() << std::endl;
+      }
     }
 
     int getSize()
@@ -101,7 +109,8 @@ namespace kyc
     vector extract(const int src_begin_index, const int elements_to_copy)
     {
       std::shared_lock<std::shared_mutex> lock{mMutex};
-      if (elements_to_copy > mSize){
+      if (elements_to_copy > mSize)
+      {
         throw std::invalid_argument{"Planning to copy " + std::to_string(elements_to_copy) + " elements of vector with size " + std::to_string(mSize)};
       }
       T *newArray = new T[elements_to_copy];
