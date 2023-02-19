@@ -68,7 +68,6 @@ namespace kyc
     {
       thread.join();
     }
-    mThreads.clear();
   }
 
   int Threadpool::getNumberThreads() const { return mWorkerThreads; }
