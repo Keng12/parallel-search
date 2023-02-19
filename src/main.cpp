@@ -41,7 +41,6 @@ int main()
                     std::unique_lock<std::mutex> lock{mutex};
                     condVar.wait(lock, [&searchFinished]
                                  { return searchFinished; });
-                    // Event handler will set the cancelSearch flag if the job queue is not empty and notify main thread
                 }
                 const std::chrono::duration<double> elapsedTime = std::chrono::steady_clock::now() - startTime;
                 std::cout << "Search time: " << elapsedTime.count() << " seconds. Size: " << output->size() << std::endl;
