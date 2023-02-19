@@ -14,12 +14,24 @@ int main(int argc, char *argv[])
 {
     try
     {
-        // int counter{};
         const int nThreads = kyc::parseInput(argc, argv);
         std::string const basename{"output"};
         std::string const dir{"results"};
         auto [filename, counter] = kyc::getFilename(dir, basename);
         kyc::vector<std::string> data = kyc::setupData("input.txt");
+        kyc::vector<kyc::vector<std::string>> chunkedData{};
+        chunkedData.reserve(nThreads);
+        const int divisor = data.size() / nThreads;
+        const int remainder = data.size() % nThreads;
+        for (int i = 0; i < nThreads; ++i){
+            kyc::vector<std::string> chunk{};
+            if (i == nThreads){
+                chunk = data.extract(i * divisor, divisor);
+            } else {
+                chunk = data.extract(i * divisor, remainder);
+            }
+            chunkedData.push_back(chunk);
+        }
         std::condition_variable condVar{};
         std::mutex mutex{};
         bool searchFinished{};

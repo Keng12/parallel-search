@@ -19,25 +19,14 @@ namespace kyc
     std::shared_mutex mMutex{};
     std::unique_ptr<T[]> mArray{};
 
-    void resize(int n)
-    {
-      if (n > mCapacity)
-      {
-        T *newArray = new T[n];
-        std::copy_n(mArray.get(), mSize, newArray);
-        mArray.reset(newArray);
-        mCapacity = n;
-      }
-      else
-      {
-        std::cerr << "Resize failed" << std::endl;
-      }
-    };
-
   public:
     vector() : mSize{0}, mCapacity{1}, mCapacityFactor{2}
     {
       mArray = std::make_unique<T[]>(mCapacity);
+    };
+    vector(std::unique_ptr<T[]> &&input_ptr) : mSize{0}, mCapacity{1}, mCapacityFactor{2}
+    {
+      mArray.swap(input_ptr);
     };
     vector(const vector &) {}
     vector &operator=(const vector &a) { return *this; }
@@ -59,7 +48,20 @@ namespace kyc
         return mArray[n];
       }
     };
-
+    void reserve(int n)
+    {
+      if (n > mCapacity)
+      {
+        T *newArray = new T[n];
+        std::copy_n(mArray.get(), mSize, newArray);
+        mArray.reset(newArray);
+        mCapacity = n;
+      }
+      else
+      {
+        std::cerr << "reserve failed" << std::endl;
+      }
+    };
     int size()
     {
       std::shared_lock<std::shared_mutex> lock{mMutex};
@@ -71,11 +73,17 @@ namespace kyc
       std::unique_lock<std::shared_mutex> lock{mMutex};
       if (mSize == mCapacity)
       {
-        resize(mCapacityFactor * mCapacity);
+        reserve(mCapacityFactor * mCapacity);
       }
       mArray[mSize] = string;
       ++mSize;
       return;
+    };
+    vector extract(const int src_begin_index, const int elements_to_copy)
+    {
+      std::unique_ptr<T[]> newArray = std::make_unique<T[]>(elements_to_copy);
+      std::copy_n(mArray.get() + src_begin_index, elements_to_copy, newArray.get());
+      return vector{std::move(newArray)};
     };
   };
 } // namespace kyc
