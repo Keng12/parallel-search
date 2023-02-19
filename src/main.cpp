@@ -50,9 +50,9 @@ int main()
                     // Event handler will set the cancelSearch flag if the job queue is not empty and notify main thread
                     if (cancelSearch)
                     {
-                        searchFinished = true;
-                        cancelSearch = false;
                         searcher.clearQueue();
+                        searchFinished = true; // Set to true so all remaining threads will return to wait
+                        cancelSearch = false;
                         continue;
                     }
                 }
