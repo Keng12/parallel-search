@@ -27,28 +27,23 @@ namespace kyc
 
     void reserve_nonlocking(int n)
     {
-      if (n > mCapacity)
-      {
-        T *newArray = new T[n];
-        std::copy_n(mArray.get(), mSize, newArray);
-        mArray.reset(newArray);
-        mCapacity = n;
-      }
-      else
-      {
-        throw std::invalid_argument{"Reserve failed with n: " << n << " and mCapacity: " << mCapacity};
-      }
+      assert(n > mCapacity);
+      T *newArray = new T[n];
+      std::copy_n(mArray.get(), mSize, newArray);
+      mArray.reset(newArray);
+      mCapacity = n;
+    }
+
+    vector(T *input_ptr, int size) : mSize{size}, mCapacity{size}, mCapacityFactor{2}
+    {
+      assert(size > 0);
+      mArray.reset(input_ptr);
     }
 
   public:
     vector() : mSize{0}, mCapacity{1}, mCapacityFactor{2}
     {
       mArray = std::make_unique<T[]>(mCapacity);
-    }
-
-    vector(T *input_ptr, int size) : mSize{size}, mCapacity{size}, mCapacityFactor{2}
-    {
-      mArray.reset(input_ptr);
     }
 
     vector(const vector &) {}
@@ -58,34 +53,15 @@ namespace kyc
     T at(int n)
     {
       std::shared_lock<std::shared_mutex> lock{mMutex};
-      if (n < 0)
-      {
-        throw std::invalid_argument{"vector::at: n " + std::to_string(n) +
-                                    " < 0"};
-      }
-      else if (n >= mSize)
-      {
-        throw std::invalid_argument{"vector::at: n " + std::to_string(n) +
-                                    " >= " + std::to_string(mSize)};
-      }
-      else
-      {
-        return mArray[n];
-      }
+      assert(n > 0 && n < mSize);
+      return mArray[n];
     };
 
     void reserve(int n)
     {
       std::unique_lock<std::shared_mutex> lock{mMutex};
       // Analogue to std::vector
-      try
-      {
-        reserve_nonlocking(n);
-      }
-      catch (const std::invalid_argument &e)
-      {
-        std::cerr << e.what() << std::endl;
-      }
+      reserve_nonlocking(n);
     }
 
     int getSize()
@@ -109,10 +85,7 @@ namespace kyc
     vector extract(const int src_begin_index, const int elements_to_copy)
     {
       std::shared_lock<std::shared_mutex> lock{mMutex};
-      if (elements_to_copy > mSize)
-      {
-        throw std::invalid_argument{"Planning to copy " + std::to_string(elements_to_copy) + " elements of vector with size " + std::to_string(mSize)};
-      }
+      assert(elements_to_copy > 0 && elements_to_copy <= mSize && src_begin_index >= 0 && src_begin_index < mSize);
       T *newArray = new T[elements_to_copy];
       std::copy_n(mArray.get() + src_begin_index, elements_to_copy, newArray);
       return vector{newArray, elements_to_copy};
