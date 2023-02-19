@@ -15,7 +15,7 @@ int main()
     try
     {
         // int counter{};
-        std::string basename{"output"};
+        std::string const basename{"output"};
         std::string const dir{"results"};
         auto [filename, counter] = kyc::getFilename(dir, basename);
         kyc::vector<std::string> data = kyc::setupData("input.txt");
@@ -36,12 +36,9 @@ int main()
             if ("0" != in)
             {
                 std::cout << "Searching for: " << in << std::endl;
-                std::shared_ptr<std::string> userInput =
-                    std::make_shared<std::string>(in);
-                std::shared_ptr<kyc::vector<std::string>> output =
-                    std::make_shared<kyc::vector<std::string>>();
-
-                auto startTime = std::chrono::steady_clock::now();
+                std::shared_ptr<std::string> userInput = std::make_shared<std::string>(in);
+                std::shared_ptr<kyc::vector<std::string>> output = std::make_shared<kyc::vector<std::string>>();
+                auto const startTime = std::chrono::steady_clock::now();
                 searcher.searchJob(output, userInput);
                 {
                     std::unique_lock<std::mutex> lock{mutex};
