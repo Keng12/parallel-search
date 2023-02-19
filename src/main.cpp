@@ -10,11 +10,12 @@
 #include "searcher.hpp"
 #include "vector.hpp"
 
-int main()
+int main(int argc, char *argv[])
 {
     try
     {
         // int counter{};
+        const int nThreads = kyc::parseInput(argc, argv);
         std::string const basename{"output"};
         std::string const dir{"results"};
         auto [filename, counter] = kyc::getFilename(dir, basename);
@@ -23,7 +24,7 @@ int main()
         std::mutex mutex{};
         bool searchFinished{};
         kyc::Searcher searcher{data, condVar, mutex, searchFinished};
-        searcher.start(std::thread::hardware_concurrency() - 1);
+        searcher.start(nThreads);
         while (true)
         {
             // During incrementel search the input will be received via an event handler
