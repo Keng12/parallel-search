@@ -43,7 +43,7 @@ namespace kyc
                         if (size == *counter) // Counter has been reached
                         {
                             // If counter has been reached but jobs are still running -> Possible that elements are processing -> do not notify yet
-                            if (mThreadpool.idle())
+                            if (mThreadpool.idle() && !getSearchFinished())
                             {
                                 // Final job and counter has been reached -> notify main thread
                                 // Necessary if job processing final element is not the final job in queue
