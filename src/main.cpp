@@ -38,8 +38,8 @@ int main(int argc, char *argv[])
             chunk = data.extract(i * divisor, nElements);
             chunkedData.push_back(chunk);
         }
-        std::condition_variable condVar{};
-        std::mutex mutex{};
+        std::condition_variable_any condVar{};
+        std::shared_mutex mutex{};
         bool searchFinished{};
         kyc::Searcher searcher{data, condVar, mutex, searchFinished};
         searcher.start(nThreads);
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
                 auto const startTime = std::chrono::steady_clock::now();
                 searcher.searchJob(output, userInput);
                 {
-                    std::unique_lock<std::mutex> lock{mutex};
+                    std::unique_lock<std::shared_mutex> lock{mutex};
                     condVar.wait(lock, [&searchFinished]
                                  { return searchFinished; });
                 }

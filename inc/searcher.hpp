@@ -16,15 +16,15 @@ class Searcher {
   kyc::Threadpool mThreadpool{};
   int mWorkerThreads{};
   kyc::vector<std::string> &mData;
-  std::condition_variable &mCV;
-  std::mutex &mMainMutex;
+  std::condition_variable_any &mCV;
+  std::shared_mutex &mMainMutex;
   bool &mSearchFinished;
 
   bool getSearchFinished();
 
 public:
   Searcher(kyc::vector<std::string> &inputVector,
-           std::condition_variable &mainCV, std::mutex &mainMutex,
+           std::condition_variable_any &mainCV, std::shared_mutex &mainMutex,
            bool &searchFinished);
 
   void start(int n);
