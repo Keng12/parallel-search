@@ -23,13 +23,19 @@ int main(int argc, char *argv[])
         chunkedData.reserve(nThreads);
         const int divisor = data.size() / nThreads;
         const int remainder = data.size() % nThreads;
-        for (int i = 0; i < nThreads; ++i){
+        for (int i = 0; i < nThreads; ++i)
+        {
             kyc::vector<std::string> chunk{};
-            if (i == nThreads){
-                chunk = data.extract(i * divisor, divisor);
-            } else {
-                chunk = data.extract(i * divisor, remainder);
+            int nElements{};
+            if (i == nThreads)
+            {
+                nElements = remainder;
             }
+            else
+            {
+                nElements = divisor;
+            }
+            chunk = data.extract(i * divisor, nElements);
             chunkedData.push_back(chunk);
         }
         std::condition_variable condVar{};

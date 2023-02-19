@@ -23,13 +23,17 @@ namespace kyc
     vector() : mSize{0}, mCapacity{1}, mCapacityFactor{2}
     {
       mArray = std::make_unique<T[]>(mCapacity);
-    };
-    vector(std::unique_ptr<T[]> &&input_ptr) : mSize{0}, mCapacity{1}, mCapacityFactor{2}
+    }
+
+    vector(T *input_ptr, int size) : mSize{size}, mCapacity{size}, mCapacityFactor{2}
     {
-      mArray.swap(input_ptr);
-    };
+      mArray.reset(input_ptr);
+    }
+
     vector(const vector &) {}
+
     vector &operator=(const vector &a) { return *this; }
+
     T at(int n)
     {
       std::shared_lock<std::shared_mutex> lock{mMutex};
@@ -48,6 +52,7 @@ namespace kyc
         return mArray[n];
       }
     };
+
     void reserve(int n)
     {
       if (n > mCapacity)
@@ -61,12 +66,13 @@ namespace kyc
       {
         std::cerr << "reserve failed" << std::endl;
       }
-    };
+    }
+
     int size()
     {
       std::shared_lock<std::shared_mutex> lock{mMutex};
       return mSize;
-    };
+    }
 
     void push_back(const T &string)
     {
@@ -78,13 +84,32 @@ namespace kyc
       mArray[mSize] = string;
       ++mSize;
       return;
-    };
+    }
+
     vector extract(const int src_begin_index, const int elements_to_copy)
     {
-      std::unique_ptr<T[]> newArray = std::make_unique<T[]>(elements_to_copy);
-      std::copy_n(mArray.get() + src_begin_index, elements_to_copy, newArray.get());
-      return vector{std::move(newArray)};
-    };
+      std::shared_lock<std::shared_mutex> lock{mMutex};
+      T *newArray = new T[elements_to_copy];
+      std::copy_n(mArray.get() + src_begin_index, elements_to_copy, newArray);
+      return vector{newArray, elements_to_copy};
+    }
+
+    T *get()
+    {
+      std::unique_lock<std::shared_mutex> lock{mMutex};
+      return mArray.get();
+    }
+
+    void append(const vector &appendage)
+    {
+      std::unique_lock<std::shared_mutex> lock{mMutex};
+      T *newArray = new T[mSize + appendage.size()];
+      std::copy_n(mArray.get(), mSize, newArray);
+      std::copy_n(appendage.get(), appendage.size(), newArray + mSize);
+      mArray.reset(newArray);
+      mSize += appendage.size();
+      mCapacity = mSize;
+    }
   };
 } // namespace kyc
 
