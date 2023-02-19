@@ -96,7 +96,7 @@ namespace kyc
 
     T *get()
     {
-      std::unique_lock<std::shared_mutex> lock{mMutex};
+      std::shared_lock<std::shared_mutex> lock{mMutex};
       return mArray.get();
     }
 
