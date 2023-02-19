@@ -15,7 +15,7 @@ namespace kyc {
 class Searcher {
   kyc::Threadpool mThreadpool{};
   int mWorkerThreads{};
-  kyc::vector<std::string> &mData;
+  kyc::vector<kyc::vector<std::string>> &mData;
   std::condition_variable_any &mCV;
   std::shared_mutex &mMainMutex;
   bool &mSearchFinished;
@@ -23,7 +23,7 @@ class Searcher {
   bool getSearchFinished();
 
 public:
-  Searcher(kyc::vector<std::string> &inputVector,
+  Searcher(kyc::vector<kyc::vector<std::string>> &inputVector,
            std::condition_variable_any &mainCV, std::shared_mutex &mainMutex,
            bool &searchFinished);
 

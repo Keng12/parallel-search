@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
         std::condition_variable_any condVar{};
         std::shared_mutex mutex{};
         bool searchFinished{};
-        kyc::Searcher searcher{data, condVar, mutex, searchFinished};
+        kyc::Searcher searcher{chunkedData, condVar, mutex, searchFinished};
         searcher.start(nThreads);
         while (true)
         {

@@ -10,7 +10,7 @@
 // No: Pop and continue
 namespace kyc
 {
-    Searcher::Searcher(kyc::vector<std::string> &inputVector,
+    Searcher::Searcher(kyc::vector<kyc::vector<std::string>> &inputVector,
                        std::condition_variable_any &mainCV, std::shared_mutex &mainMutex,
                        bool &searchFinished)
         : mData{inputVector}, mCV{mainCV}, mMainMutex{mainMutex},
@@ -23,8 +23,7 @@ namespace kyc
         mWorkerThreads = mThreadpool.getNumberThreads();
     };
 
-    void Searcher::searchJob(std::shared_ptr<kyc::vector<std::string>> outputVector,
-                             std::shared_ptr<std::string> userInput)
+    void Searcher::searchJob(std::shared_ptr<std::string> userInput)
     {
         const int size = mData.getSize();
         mSearchFinished = false;
@@ -33,8 +32,11 @@ namespace kyc
         // Post jobs equal to number of working threads;
         for (int i = 0; i < mWorkerThreads; ++i)
         {
-            const auto job = [jobMutex, this, outputVector, userInput, size, counter]()
+            std::shared_ptr<kyc::vector<std::string>> data = std::make_shared<kyc::vector<std::string>>(mData.at(i));
+            std::shared_ptr<kyc::vector<std::string>> outputVector = std::make_shared<kyc::vector<std::string>>();
+            const auto job = [data, outputVector, userInput]()
             {
+                outputVector->reserve(data->getSize());
                 do
                 {
                     int index{};
