@@ -85,7 +85,7 @@ namespace kyc
     {
         {
             std::lock_guard<std::mutex> lock{mMainMutex};
-            mSearchFinished = true; // Set boolean for main thread AFTER pushing back element
+            mSearchFinished = true; 
         }
         mCV.notify_one();
         return;
