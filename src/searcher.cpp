@@ -12,9 +12,9 @@ namespace kyc
 {
     Searcher::Searcher(kyc::vector<std::string> &inputVector,
                        std::condition_variable &mainCV, std::mutex &mainMutex,
-                       bool &searchFlag, bool &cancelSearch)
+                       bool &searchFinished, bool &cancelSearch)
         : mData{inputVector}, mCV{mainCV}, mMainMutex{mainMutex},
-          mSearchFlag{searchFlag}, mCancelSearch{cancelSearch} {};
+          msearchFinished{searchFinished}, mCancelSearch{cancelSearch} {};
 
     void Searcher::start(int n)
     {
@@ -26,7 +26,7 @@ namespace kyc
                              std::shared_ptr<std::string> userInput)
     {
         const int size = mData.size();
-        mSearchFlag = false;
+        msearchFinished = false;
         std::shared_ptr<int> counter = std::make_shared<int>(0);
         std::shared_ptr<std::mutex> jobMutex = std::make_shared<std::mutex>();
         const double nIteration{
@@ -104,7 +104,7 @@ namespace kyc
         std::cout << "Notify main thread" << std::endl;
         {
             std::lock_guard<std::mutex> lock{mMainMutex};
-            mSearchFlag = true; // Set boolean for main thread AFTER pushing back element
+            msearchFinished = true; // Set boolean for main thread AFTER pushing back element
         }
         mCV.notify_one();
         return;

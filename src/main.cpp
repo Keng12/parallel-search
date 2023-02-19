@@ -21,9 +21,9 @@ int main()
         kyc::vector<std::string> data = kyc::setupData("input.txt");
         std::condition_variable condVar{};
         std::mutex mutex{};
-        bool searchFlag{};
+        bool searchFinished{};
         bool cancelSearch{};
-        kyc::Searcher searcher{data, condVar, mutex, searchFlag, cancelSearch};
+        kyc::Searcher searcher{data, condVar, mutex, searchFinished, cancelSearch};
         std::cout << "Setup searcher" << std::endl;
         searcher.start(std::thread::hardware_concurrency() - 1);
         std::cout << "Setup searcher finished" << std::endl;
@@ -45,8 +45,8 @@ int main()
                 searcher.searchJob(output, userInput);
                 {
                     std::unique_lock<std::mutex> lock{mutex};
-                    condVar.wait(lock, [&searchFlag, &cancelSearch]
-                                 { return searchFlag || cancelSearch; });
+                    condVar.wait(lock, [&searchFinished, &cancelSearch]
+                                 { return searchFinished || cancelSearch; });
                     // Event handler will set the cancelSearch flag if the job queue is not empty
                     if (cancelSearch)
                     {
@@ -55,10 +55,8 @@ int main()
                         continue;
                     }
                 }
-                std::chrono::duration<double> elapsedTime =
-                    std::chrono::steady_clock::now() - startTime;
-                std::cout << "Search time: " << elapsedTime.count()
-                          << " seconds. Size: " << output->size() << std::endl;
+                const std::chrono::duration<double> elapsedTime = std::chrono::steady_clock::now() - startTime;
+                std::cout << "Search time: " << elapsedTime.count() << " seconds. Size: " << output->size() << std::endl;
                 std::stringstream ss{};
                 for (int i = 0; i < output->size(); ++i)
                 {
@@ -68,8 +66,7 @@ int main()
                 out << ss.str();
                 ++counter;
                 filename = dir + "/" + basename + std::to_string(counter) + ".txt";
-                std::cout << "Wrote search results of " << in << " in: " << filename
-                          << std::endl;
+                std::cout << "Wrote search results of " << in << " in: " << filename << std::endl;
             }
             else
             {
