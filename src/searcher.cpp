@@ -46,7 +46,9 @@ namespace kyc
                         {
                             if (mThreadpool.idle())
                             {
-                                notifyMainThread(); // Final job and counter has been reached -> notify main thread
+                                // Final job and counter has been reached -> notify main thread
+                                // Necessary if job processing final element is not the final job in queue
+                                notifyMainThread(); 
                             }
                             return;
                         }
@@ -68,7 +70,7 @@ namespace kyc
                     // Check if BOTH finished and last job
                     // Possible: Finished but not final job (e.g. if previous jobs still
                     // processing) or final job but not finished yet (e.g. during startup)
-                    if (finished && idle())
+                    if (finished && mThreadpool.idle())
                     {
                         notifyMainThread(); // Set boolean for main thread AFTER pushing back element
                     }
@@ -79,8 +81,6 @@ namespace kyc
     };
 
     void Searcher::stop() { mThreadpool.stop(); };
-
-    bool Searcher::idle() { return mThreadpool.idle(); }
     void Searcher::notifyMainThread()
     {
         {

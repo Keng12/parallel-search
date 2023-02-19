@@ -29,7 +29,6 @@ public:
   void searchJob(std::shared_ptr<kyc::vector<std::string>> outputVector,
                  std::shared_ptr<std::string> userInput);
   void stop();
-  bool idle();
   void notifyMainThread();
 };
 } // namespace kyc
