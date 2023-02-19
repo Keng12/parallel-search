@@ -22,8 +22,7 @@ int main()
         std::condition_variable condVar{};
         std::mutex mutex{};
         bool searchFinished{};
-        bool cancelSearch{};
-        kyc::Searcher searcher{data, condVar, mutex, searchFinished, cancelSearch};
+        kyc::Searcher searcher{data, condVar, mutex, searchFinished};
         std::cout << "Setup searcher" << std::endl;
         searcher.start(std::thread::hardware_concurrency() - 1);
         std::cout << "Setup searcher finished" << std::endl;
@@ -41,17 +40,11 @@ int main()
                 auto const startTime = std::chrono::steady_clock::now();
                 searcher.searchJob(output, userInput);
                 {
+                    std::cout << "Main thread waiting" << std::endl;
                     std::unique_lock<std::mutex> lock{mutex};
-                    condVar.wait(lock, [&searchFinished, &cancelSearch]
-                                 { return searchFinished || cancelSearch; });
+                    condVar.wait(lock, [&searchFinished]
+                                 { return searchFinished; });
                     // Event handler will set the cancelSearch flag if the job queue is not empty and notify main thread
-                    if (cancelSearch)
-                    {
-                        searcher.clearQueue();
-                        searchFinished = true; // Set to true so all remaining threads will return to wait
-                        cancelSearch = false;
-                        continue;
-                    }
                 }
                 const std::chrono::duration<double> elapsedTime = std::chrono::steady_clock::now() - startTime;
                 std::cout << "Search time: " << elapsedTime.count() << " seconds. Size: " << output->size() << std::endl;

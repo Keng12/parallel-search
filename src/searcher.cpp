@@ -12,9 +12,9 @@ namespace kyc
 {
     Searcher::Searcher(kyc::vector<std::string> &inputVector,
                        std::condition_variable &mainCV, std::mutex &mainMutex,
-                       bool &searchFinished, bool &cancelSearch)
+                       bool &searchFinished)
         : mData{inputVector}, mCV{mainCV}, mMainMutex{mainMutex},
-          mSearchFinished{searchFinished}, mCancelSearch{cancelSearch} {};
+          mSearchFinished{searchFinished} {};
 
     void Searcher::start(int n)
     {
@@ -38,52 +38,39 @@ namespace kyc
             {
                 for (int j = 0; j < nIteration; ++j)
                 {
-                    bool searchEnd{};
+                    int index{};
+                    bool finished{};
                     {
-                        std::lock_guard<std::mutex> lock{mMainMutex};
-                        searchEnd = mCancelSearch || mSearchFinished;
-                    }
-                    if (searchEnd)
-                    {
-                        // Search has been cancelled -> event handler is supposed to notify main thread
-                        return;
-                    }
-                    else
-                    {
-                        int index{};
-                        bool finished{};
+                        std::lock_guard<std::mutex> lock{*jobMutex};
+                        if (size == *counter) // Counter has been reached
                         {
-                            std::lock_guard<std::mutex> lock{*jobMutex};
-                            if (*counter == size) // Counter has been reached
+                            if (mThreadpool.idle())
                             {
-                                if (mThreadpool.idle())
-                                {
-                                    notifyMainThread(); // Final job and counter has been reached -> notify main thread
-                                }
-                                return;
+                                notifyMainThread(); // Final job and counter has been reached -> notify main thread
                             }
-                            else
+                            return;
+                        }
+                        else
+                        {
+                            index = *counter;
+                            ++(*counter);
+                            if (size == *counter) // Processing last element -> Notify main thread afterwards
                             {
-                                index = *counter;
-                                ++(*counter);
-                                if (*counter == size) // Processing last element -> Notify main thread afterwards
-                                {
-                                    finished = true; // Set local boolean
-                                }
+                                finished = true; // Set local boolean
                             }
                         }
-                        std::string element{mData.at(index)};
-                        if (0 == element.rfind(*userInput, 0))
-                        {
-                            outputVector->push_back(element);
-                        }
-                        // Check if BOTH finished and last job
-                        // Possible: Finished but not final job (e.g. if previous jobs still
-                        // processing) or final job but not finished yet (e.g. during startup)
-                        if (finished && idle())
-                        {
-                            notifyMainThread(); // Set boolean for main thread AFTER pushing back element
-                        }
+                    }
+                    std::string element{mData.at(index)};
+                    if (0 == element.rfind(*userInput, 0))
+                    {
+                        outputVector->push_back(element);
+                    }
+                    // Check if BOTH finished and last job
+                    // Possible: Finished but not final job (e.g. if previous jobs still
+                    // processing) or final job but not finished yet (e.g. during startup)
+                    if (finished && idle())
+                    {
+                        notifyMainThread(); // Set boolean for main thread AFTER pushing back element
                     }
                 }
             };
@@ -94,10 +81,6 @@ namespace kyc
     void Searcher::stop() { mThreadpool.stop(); };
 
     bool Searcher::idle() { return mThreadpool.idle(); }
-    void Searcher::clearQueue()
-    {
-        mThreadpool.clearQueue();
-    }
     void Searcher::notifyMainThread()
     {
         std::cout << "Notify main thread" << std::endl;

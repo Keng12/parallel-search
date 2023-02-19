@@ -80,12 +80,4 @@ namespace kyc
     }
     return idle;
   }
-  void Threadpool::clearQueue()
-  {
-    {
-      std::lock_guard<std::mutex> lock(mMutex);
-      mJobQueue.clear();
-    }
-    return;
-  }
 }; // namespace kyc
