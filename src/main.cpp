@@ -20,22 +20,22 @@ int main(int argc, char *argv[])
         auto [filename, counter] = kyc::getFilename(dir, basename);
         kyc::vector<std::string> data = kyc::setupData("input.txt");
         kyc::vector<kyc::vector<std::string>> chunkedData{};
-        chunkedData.reserve(nThreads);
-        const int divisor = data.getSize() / nThreads;
-        const int remainder = data.getSize() % nThreads;
+        if (chunkedData.getCapacity() < nThreads)
+        {
+            chunkedData.reserve(nThreads);
+        }
+        const int chunkSize = data.getSize() / nThreads;
         for (int i = 0; i < nThreads; ++i)
         {
             kyc::vector<std::string> chunk{};
-            int nElements{};
-            if (i == nThreads - 1)
-            {
-                nElements = remainder;
-            }
-            else
-            {
-                nElements = divisor;
-            }
-            chunk = data.extract(i * divisor, nElements);
+            chunk = data.extract(i * chunkSize, chunkSize);
+            chunkedData.push_back(chunk);
+        }
+        const int remainder = data.getSize() % nThreads;
+        if (remainder > 0)
+        {
+            kyc::vector<std::string> chunk{};
+            chunk = data.extract(nThreads * chunkSize, remainder);
             chunkedData.push_back(chunk);
         }
         std::condition_variable_any condVar{};
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
         searcher.start(nThreads);
         while (true)
         {
-            // During incrementel search the input will be received via an event handler
+            // During incremental search the input will be received via an event handler
             std::string in{};
             std::cout << "Enter search string:" << std::endl;
             std::cin >> in;

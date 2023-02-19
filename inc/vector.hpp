@@ -27,6 +27,7 @@ namespace kyc
 
     void reserve_nonlocking(int n)
     {
+      std::cout << n << "  " << mCapacity << " " << mSize << std::endl;
       assert(n > mCapacity);
       T *newArray = new T[n];
       std::copy_n(mArray.get(), mSize, newArray);
@@ -49,6 +50,12 @@ namespace kyc
     vector(const vector &) {}
 
     vector &operator=(const vector &a) { return *this; }
+
+    int getCapacity()
+    {
+      std::shared_lock<std::shared_mutex> lock{mMutex};
+      return mCapacity;
+    }
 
     T at(int n)
     {
