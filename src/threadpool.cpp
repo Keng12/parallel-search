@@ -17,6 +17,7 @@ namespace kyc
 {
   void Threadpool::start(int nWorkerThreads)
   {
+    assert(nWorkerThreads > 0);
     mWorkerThreads = nWorkerThreads;
     std::cout << "Threadpool: no threads: " << mWorkerThreads << std::endl;
     mThreads.reserve(mWorkerThreads);
@@ -25,7 +26,7 @@ namespace kyc
     {
       mThreads.emplace_back(&Threadpool::threadLoop, this);
     }
-  };
+  }
 
   void Threadpool::threadLoop()
   {
@@ -33,7 +34,7 @@ namespace kyc
     {
       std::function<void()> job;
       {
-        std::unique_lock<std::mutex> lock(mMutex);
+        std::unique_lock<std::shared_mutex> lock{mMutex};
         mCondVar.wait(lock, [this]
                       { return !mJobQueue.empty() || mShutdown; });
         if (mShutdown)
@@ -45,20 +46,21 @@ namespace kyc
       }
       job();
     }
-  };
+  }
+
   void Threadpool::postJob(const std::function<void()> &job)
   {
     {
-      std::lock_guard<std::mutex> lock(mMutex);
+      std::unique_lock<std::shared_mutex> lock(mMutex);
       mJobQueue.push_back(job);
     }
     mCondVar.notify_one();
-  };
+  }
 
   void Threadpool::stop()
   {
     {
-      std::unique_lock<std::mutex> lock(mMutex);
+      std::unique_lock<std::shared_mutex> lock(mMutex);
       mShutdown = true;
     }
     mCondVar.notify_all();
@@ -67,7 +69,7 @@ namespace kyc
       thread.join();
     }
     mThreads.clear();
-  };
+  }
 
   int Threadpool::getNumberThreads() const { return mWorkerThreads; }
 
@@ -75,7 +77,7 @@ namespace kyc
   {
     bool idle{};
     {
-      std::lock_guard<std::mutex> lock(mMutex);
+      std::shared_lock<std::shared_mutex> lock(mMutex);
       idle = mJobQueue.empty();
     }
     return idle;

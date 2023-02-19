@@ -18,6 +18,7 @@ namespace kyc
 
     void Searcher::start(int n)
     {
+        assert(n > 0);
         mThreadpool.start(n);
         mWorkerThreads = mThreadpool.getNumberThreads();
     };
