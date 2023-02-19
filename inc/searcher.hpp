@@ -31,7 +31,6 @@ public:
   void stop();
   bool idle();
   void notifyMainThread();
-  void clearQueue();
 };
 } // namespace kyc
 #endif
