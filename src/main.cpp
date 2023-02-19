@@ -23,9 +23,7 @@ int main()
         std::mutex mutex{};
         bool searchFinished{};
         kyc::Searcher searcher{data, condVar, mutex, searchFinished};
-        std::cout << "Setup searcher" << std::endl;
         searcher.start(std::thread::hardware_concurrency() - 1);
-        std::cout << "Setup searcher finished" << std::endl;
         while (true)
         {
             // During incrementel search the input will be received via an event handler
@@ -40,7 +38,6 @@ int main()
                 auto const startTime = std::chrono::steady_clock::now();
                 searcher.searchJob(output, userInput);
                 {
-                    std::cout << "Main thread waiting" << std::endl;
                     std::unique_lock<std::mutex> lock{mutex};
                     condVar.wait(lock, [&searchFinished]
                                  { return searchFinished; });

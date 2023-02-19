@@ -83,7 +83,6 @@ namespace kyc
     bool Searcher::idle() { return mThreadpool.idle(); }
     void Searcher::notifyMainThread()
     {
-        std::cout << "Notify main thread" << std::endl;
         {
             std::lock_guard<std::mutex> lock{mMainMutex};
             mSearchFinished = true; // Set boolean for main thread AFTER pushing back element
