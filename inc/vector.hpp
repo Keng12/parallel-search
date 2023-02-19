@@ -101,6 +101,9 @@ namespace kyc
     vector extract(const int src_begin_index, const int elements_to_copy)
     {
       std::shared_lock<std::shared_mutex> lock{mMutex};
+      if (elements_to_copy > mSize){
+        throw std::invalid_argument{"Planning to copy " + std::to_string(elements_to_copy) + " elements of vector with size " + std::to_string(mSize)};
+      }
       T *newArray = new T[elements_to_copy];
       std::copy_n(mArray.get() + src_begin_index, elements_to_copy, newArray);
       return vector{newArray, elements_to_copy};

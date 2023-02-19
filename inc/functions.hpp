@@ -14,5 +14,6 @@ kyc::vector<std::string> setupData(std::string const &filename);
 std::tuple<std::string, int> getFilename(std::string const &dir,
                                          std::string const &basename);
 int parseInput(const int argc, char **argv);
+kyc::vector<std::string> searchData();
 } // namespace kyc
 #endif
