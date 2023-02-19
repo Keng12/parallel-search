@@ -47,11 +47,12 @@ int main()
                     std::unique_lock<std::mutex> lock{mutex};
                     condVar.wait(lock, [&searchFinished, &cancelSearch]
                                  { return searchFinished || cancelSearch; });
-                    // Event handler will set the cancelSearch flag if the job queue is not empty
+                    // Event handler will set the cancelSearch flag if the job queue is not empty and notify main thread
                     if (cancelSearch)
                     {
-                        searcher.clearQueue();
+                        searchFinished = true;
                         cancelSearch = false;
+                        searcher.clearQueue();
                         continue;
                     }
                 }

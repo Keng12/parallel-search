@@ -18,7 +18,7 @@ class Searcher {
   kyc::vector<std::string> &mData;
   std::condition_variable &mCV;
   std::mutex &mMainMutex;
-  bool &msearchFinished;
+  bool &mSearchFinished;
   bool &mCancelSearch;
 
 public:

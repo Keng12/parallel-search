@@ -14,7 +14,7 @@ namespace kyc
                        std::condition_variable &mainCV, std::mutex &mainMutex,
                        bool &searchFinished, bool &cancelSearch)
         : mData{inputVector}, mCV{mainCV}, mMainMutex{mainMutex},
-          msearchFinished{searchFinished}, mCancelSearch{cancelSearch} {};
+          mSearchFinished{searchFinished}, mCancelSearch{cancelSearch} {};
 
     void Searcher::start(int n)
     {
@@ -26,7 +26,7 @@ namespace kyc
                              std::shared_ptr<std::string> userInput)
     {
         const int size = mData.size();
-        msearchFinished = false;
+        mSearchFinished = false;
         std::shared_ptr<int> counter = std::make_shared<int>(0);
         std::shared_ptr<std::mutex> jobMutex = std::make_shared<std::mutex>();
         const double nIteration{
@@ -38,15 +38,14 @@ namespace kyc
             {
                 for (int j = 0; j < nIteration; ++j)
                 {
-                    bool searchCanceled{};
+                    bool searchEnd{};
                     {
                         std::lock_guard<std::mutex> lock{mMainMutex};
-                        searchCanceled = mCancelSearch;
+                        searchEnd = mCancelSearch || mSearchFinished;
                     }
-                    if (searchCanceled)
+                    if (searchEnd)
                     {
-                        // Search has been cancelled -> notify main thread
-                        notifyMainThread();
+                        // Search has been cancelled -> event handler is supposed to notify main thread
                         return;
                     }
                     else
@@ -104,7 +103,7 @@ namespace kyc
         std::cout << "Notify main thread" << std::endl;
         {
             std::lock_guard<std::mutex> lock{mMainMutex};
-            msearchFinished = true; // Set boolean for main thread AFTER pushing back element
+            mSearchFinished = true; // Set boolean for main thread AFTER pushing back element
         }
         mCV.notify_one();
         return;
