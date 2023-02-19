@@ -60,7 +60,6 @@ namespace kyc
     void reserve(int n)
     {
       std::unique_lock<std::shared_mutex> lock{mMutex};
-      // Analogue to std::vector
       reserve_nonlocking(n);
     }
 
