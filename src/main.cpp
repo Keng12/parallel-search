@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
         {
             kyc::vector<std::string> chunk{};
             int nElements{};
-            if (i == nThreads)
+            if (i == nThreads - 1)
             {
                 nElements = remainder;
             }
