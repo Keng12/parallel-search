@@ -29,14 +29,12 @@ namespace kyc
         mSearchFinished = false;
         std::shared_ptr<int> counter = std::make_shared<int>(0);
         std::shared_ptr<std::mutex> jobMutex = std::make_shared<std::mutex>();
-        const double nIteration{
-            std::ceil(size / static_cast<double>(mWorkerThreads))};
         // Post jobs equal to number of working threads;
         for (int i = 0; i < mWorkerThreads; ++i)
         {
-            const auto job = [nIteration, jobMutex, this, outputVector, userInput, size, counter]()
+            const auto job = [jobMutex, this, outputVector, userInput, size, counter]()
             {
-                for (int j = 0; j < nIteration; ++j)
+                do
                 {
                     int index{};
                     bool finished{};
@@ -48,7 +46,7 @@ namespace kyc
                             {
                                 // Final job and counter has been reached -> notify main thread
                                 // Necessary if job processing final element is not the final job in queue
-                                notifyMainThread(); 
+                                notifyMainThread();
                             }
                             return;
                         }
@@ -74,7 +72,7 @@ namespace kyc
                     {
                         notifyMainThread(); // Set boolean for main thread AFTER pushing back element
                     }
-                }
+                } while (!getSearchFinished());
             };
             mThreadpool.postJob(job);
         }
@@ -85,9 +83,19 @@ namespace kyc
     {
         {
             std::lock_guard<std::mutex> lock{mMainMutex};
-            mSearchFinished = true; 
+            mSearchFinished = true;
         }
         mCV.notify_one();
         return;
+    }
+
+    bool Searcher::getSearchFinished()
+    {
+        bool searchFinished{};
+        {
+            std::lock_guard<std::mutex> lock{mMainMutex};
+            searchFinished = mSearchFinished;
+        }
+        return searchFinished;
     }
 }; // namespace kyc

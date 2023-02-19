@@ -20,6 +20,8 @@ class Searcher {
   std::mutex &mMainMutex;
   bool &mSearchFinished;
 
+  bool getSearchFinished();
+
 public:
   Searcher(kyc::vector<std::string> &inputVector,
            std::condition_variable &mainCV, std::mutex &mainMutex,
