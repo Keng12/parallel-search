@@ -25,7 +25,7 @@ namespace kyc
     void Searcher::searchJob(std::shared_ptr<kyc::vector<std::string>> outputVector,
                              std::shared_ptr<std::string> userInput)
     {
-        const int size = mData.size();
+        const int size = mData.getSize();
         mSearchFinished = false;
         std::shared_ptr<int> counter = std::make_shared<int>(0);
         std::shared_ptr<std::mutex> jobMutex = std::make_shared<std::mutex>();

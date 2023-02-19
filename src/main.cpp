@@ -21,8 +21,8 @@ int main(int argc, char *argv[])
         kyc::vector<std::string> data = kyc::setupData("input.txt");
         kyc::vector<kyc::vector<std::string>> chunkedData{};
         chunkedData.reserve(nThreads);
-        const int divisor = data.size() / nThreads;
-        const int remainder = data.size() % nThreads;
+        const int divisor = data.getSize() / nThreads;
+        const int remainder = data.getSize() % nThreads;
         for (int i = 0; i < nThreads; ++i)
         {
             kyc::vector<std::string> chunk{};
@@ -62,9 +62,9 @@ int main(int argc, char *argv[])
                                  { return searchFinished; });
                 }
                 const std::chrono::duration<double> elapsedTime = std::chrono::steady_clock::now() - startTime;
-                std::cout << "Search time: " << elapsedTime.count() << " seconds. Size: " << output->size() << std::endl;
+                std::cout << "Search time: " << elapsedTime.count() << " seconds. Size: " << output->getSize() << std::endl;
                 std::stringstream ss{};
-                for (int i = 0; i < output->size(); ++i)
+                for (int i = 0; i < output->getSize(); ++i)
                 {
                     ss << output->at(i) << "\n";
                 }

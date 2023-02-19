@@ -19,6 +19,27 @@ namespace kyc
     std::shared_mutex mMutex{};
     std::unique_ptr<T[]> mArray{};
 
+    T *get()
+    {
+      std::shared_lock<std::shared_mutex> lock{mMutex};
+      return mArray.get();
+    }
+
+    void reserve_nonlocking(int n)
+    {
+      if (n > mCapacity)
+      {
+        T *newArray = new T[n];
+        std::copy_n(mArray.get(), mSize, newArray);
+        mArray.reset(newArray);
+        mCapacity = n;
+      }
+      else
+      {
+        std::cerr << "Reserve failed with n: " << n << " and mCapacity: " << mCapacity << std::endl;
+      }
+    }
+
   public:
     vector() : mSize{0}, mCapacity{1}, mCapacityFactor{2}
     {
@@ -55,20 +76,11 @@ namespace kyc
 
     void reserve(int n)
     {
-      if (n > mCapacity)
-      {
-        T *newArray = new T[n];
-        std::copy_n(mArray.get(), mSize, newArray);
-        mArray.reset(newArray);
-        mCapacity = n;
-      }
-      else
-      {
-        std::cerr << "reserve failed" << std::endl;
-      }
+      std::unique_lock<std::shared_mutex> lock{mMutex};
+      reserve_nonlocking(n);
     }
 
-    int size()
+    int getSize()
     {
       std::shared_lock<std::shared_mutex> lock{mMutex};
       return mSize;
@@ -79,7 +91,7 @@ namespace kyc
       std::unique_lock<std::shared_mutex> lock{mMutex};
       if (mSize == mCapacity)
       {
-        reserve(mCapacityFactor * mCapacity);
+        reserve_nonlocking(mCapacityFactor * mCapacity);
       }
       mArray[mSize] = string;
       ++mSize;
@@ -94,20 +106,14 @@ namespace kyc
       return vector{newArray, elements_to_copy};
     }
 
-    T *get()
-    {
-      std::shared_lock<std::shared_mutex> lock{mMutex};
-      return mArray.get();
-    }
-
     void append(const vector &appendage)
     {
       std::unique_lock<std::shared_mutex> lock{mMutex};
-      T *newArray = new T[mSize + appendage.size()];
+      T *newArray = new T[mSize + appendage.getSize()];
       std::copy_n(mArray.get(), mSize, newArray);
-      std::copy_n(appendage.get(), appendage.size(), newArray + mSize);
+      std::copy_n(appendage.get(), appendage.getSize(), newArray + mSize);
       mArray.reset(newArray);
-      mSize += appendage.size();
+      mSize += appendage.getSize();
       mCapacity = mSize;
     }
   };
