@@ -42,6 +42,7 @@ namespace kyc
                         std::lock_guard<std::mutex> lock{*jobMutex};
                         if (size == *counter) // Counter has been reached
                         {
+                            // If counter has been reached but jobs are still running -> Possible that elements are processing -> do not notify yet
                             if (mThreadpool.idle())
                             {
                                 // Final job and counter has been reached -> notify main thread
@@ -72,6 +73,7 @@ namespace kyc
                     {
                         notifyMainThread(); // Set boolean for main thread AFTER pushing back element
                     }
+                // In case final job is not final element to be processed -> Still cancel while loop
                 } while (!getSearchFinished());
             };
             mThreadpool.postJob(job);
