@@ -1,17 +1,17 @@
 #ifndef FUNCTIONS_HPP
 #define FUNCTIONS_HPP
 
+#include "vector.hpp"
 #include <array>
-#include <string>
+#include <filesystem>
 #include <fstream>
 #include <sstream>
-#include <filesystem>
+#include <string>
+#include <tuple>
 
-#include "vector.hpp"
-
-namespace kyc
-{
-    kyc::vector<std::string> setupData(std::string const &filename);
-    std::string getFilename(std::string const &dir, std::string const &basename, int &counter);
-}
+namespace kyc {
+kyc::vector<std::string> setupData(std::string const &filename);
+std::tuple<std::string, int> getFilename(std::string const &dir,
+                                         std::string const &basename);
+} // namespace kyc
 #endif

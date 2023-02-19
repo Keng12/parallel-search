@@ -1,53 +1,64 @@
-#include <iostream>
-#include <string>
-#include <vector>
 #include <chrono>
-#include <sstream>
 #include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
 #include <thread>
+#include <vector>
 
-#include "vector.hpp"
-#include "searcher.hpp"
 #include "functions.hpp"
+#include "searcher.hpp"
+#include "vector.hpp"
 
 int main()
 {
     try
     {
-        int counter{};
+        // int counter{};
         std::string basename{"output"};
         std::string const dir{"results"};
-        std::string filename = kyc::getFilename(dir, basename, counter);
+        auto [filename, counter] = kyc::getFilename(dir, basename);
         kyc::vector<std::string> data = kyc::setupData("input.txt");
         std::condition_variable condVar{};
         std::mutex mutex{};
         bool searchFlag{};
-
-        kyc::Searcher searcher{data, condVar, mutex, searchFlag};
+        bool cancelSearch{};
+        kyc::Searcher searcher{data, condVar, mutex, searchFlag, cancelSearch};
         std::cout << "Setup searcher" << std::endl;
         searcher.start(std::thread::hardware_concurrency() - 1);
         std::cout << "Setup searcher finished" << std::endl;
         while (true)
         {
+            // During incrementel search the input will be received via an event handler
             std::string in{};
             std::cout << "Enter search string:" << std::endl;
             std::cin >> in;
             if ("0" != in)
             {
                 std::cout << "Searching for: " << in << std::endl;
-                std::shared_ptr<std::string> userInput = std::make_shared<std::string>(in);
-                std::shared_ptr<kyc::vector<std::string>>
-                    output = std::make_shared<kyc::vector<std::string>>();
+                std::shared_ptr<std::string> userInput =
+                    std::make_shared<std::string>(in);
+                std::shared_ptr<kyc::vector<std::string>> output =
+                    std::make_shared<kyc::vector<std::string>>();
 
                 auto startTime = std::chrono::steady_clock::now();
                 searcher.searchJob(output, userInput);
                 {
                     std::unique_lock<std::mutex> lock{mutex};
-                    condVar.wait(lock, [&searchFlag]
-                                 { return searchFlag; });
+                    condVar.wait(lock, [&searchFlag, &cancelSearch]
+                                 { return searchFlag || cancelSearch; });
+                    // Event handler will set the cancelSearch flag if the job queue is not empty
+                    if (cancelSearch)
+                    {
+                        searcher.clearQueue();
+                        cancelSearch = false;
+                        continue;
+                    }
                 }
-                std::chrono::duration<double> elapsedTime = std::chrono::steady_clock::now() - startTime;
-                std::cout << "Search time: " << elapsedTime.count() << " seconds. Size: " << output->size() << std::endl;
+                std::chrono::duration<double> elapsedTime =
+                    std::chrono::steady_clock::now() - startTime;
+                std::cout << "Search time: " << elapsedTime.count()
+                          << " seconds. Size: " << output->size() << std::endl;
                 std::stringstream ss{};
                 for (int i = 0; i < output->size(); ++i)
                 {
@@ -57,7 +68,8 @@ int main()
                 out << ss.str();
                 ++counter;
                 filename = dir + "/" + basename + std::to_string(counter) + ".txt";
-                std::cout << "Wrote search results of " << in << " in: " << filename << std::endl;
+                std::cout << "Wrote search results of " << in << " in: " << filename
+                          << std::endl;
             }
             else
             {
