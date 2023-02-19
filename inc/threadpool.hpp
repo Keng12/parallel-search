@@ -31,7 +31,6 @@ public:
   void postJob(const std::function<void()> &job);
   void stop();
   int getNumberThreads() const;
-  void clearQueue();
 };
 
 } // namespace kyc

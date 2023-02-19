@@ -19,12 +19,11 @@ class Searcher {
   std::condition_variable &mCV;
   std::mutex &mMainMutex;
   bool &mSearchFinished;
-  bool &mCancelSearch;
 
 public:
   Searcher(kyc::vector<std::string> &inputVector,
            std::condition_variable &mainCV, std::mutex &mainMutex,
-           bool &searchFinished, bool &cancelSearch);
+           bool &searchFinished);
 
   void start(int n);
   void searchJob(std::shared_ptr<kyc::vector<std::string>> outputVector,
