@@ -22,13 +22,13 @@ namespace kyc
     std::shared_mutex &mMainMutex;
     bool &mSearchFinished;
     std::atomic<int> mTotalCounter{};
-    int mTotalSize{};
+    const int mTotalSize{};
     bool getSearchFinished();
 
   public:
     Searcher(kyc::vector<kyc::vector<std::string>> &inputVector,
              std::condition_variable_any &mainCV, std::shared_mutex &mainMutex,
-             bool &searchFinished);
+             bool &searchFinished, const int totalSize);
 
     void start(int n);
     void searchJob(const std::string &userInput, kyc::vector<std::shared_ptr<kyc::vector<std::string>>> &output_ptr);

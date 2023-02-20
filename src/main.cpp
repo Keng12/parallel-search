@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
         bool searchFinished{};
         kyc::vector<kyc::vector<std::string>> chunkedData = kyc::splitData(data, nThreads);
         std::cout << "Finish split data (main)" << std::endl;
-        kyc::Searcher searcher{chunkedData, condVar, mutex, searchFinished};
+        kyc::Searcher searcher{chunkedData, condVar, mutex, searchFinished, data.getSize()};
         searcher.start(nThreads);
         while (true)
         {

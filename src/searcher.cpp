@@ -12,19 +12,15 @@ namespace kyc
 {
     Searcher::Searcher(kyc::vector<kyc::vector<std::string>> &inputVector,
                        std::condition_variable_any &mainCV, std::shared_mutex &mainMutex,
-                       bool &searchFinished)
+                       bool &searchFinished, const int totalSize)
         : mData{inputVector}, mCV{mainCV}, mMainMutex{mainMutex},
-          mSearchFinished{searchFinished} {};
+          mSearchFinished{searchFinished}, mTotalSize{totalSize} {};
 
     void Searcher::start(int n)
     {
         assert(n > 0);
         mThreadpool.start(n);
         mWorkerThreads = mThreadpool.getNumberThreads();
-        for (int i = 0; i < mWorkerThreads; ++i)
-        {
-            mTotalSize += mData.at(i).getSize();
-        }
     };
 
     kyc::vector<std::string> Searcher::search(const std::string &userInput)
@@ -71,7 +67,7 @@ namespace kyc
                         std::cout << "Final element " << index << std::endl;
                         mTotalCounter += index;
                         std::cout << "Total counter: " << mTotalCounter << std::endl;
-                        if (mThreadpool.idle() && mTotalCounter == mTotalSize)
+                        if (mTotalCounter == mTotalSize)
                         {
                             notifyMainThread();
                         }
@@ -83,7 +79,7 @@ namespace kyc
                         output->push_back(std::move(element));
                     }
                     ++index;
-                } while (!getSearchFinished());
+                } while (true);
             };
             mThreadpool.postJob(job);
         }
