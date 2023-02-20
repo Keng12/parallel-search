@@ -21,6 +21,10 @@ namespace kyc
         assert(n > 0);
         mThreadpool.start(n);
         mWorkerThreads = mThreadpool.getNumberThreads();
+        for (int i = 0; i < mWorkerThreads; ++i)
+        {
+            mTotalSize += mData.at(i).getSize();
+        }
     };
 
     kyc::vector<std::string> Searcher::search(const std::string &userInput)
@@ -36,21 +40,20 @@ namespace kyc
         kyc::vector<std::string> result{};
         for (int i = 0; i < mWorkerThreads; ++i)
         {
-            std::cout << "output size: " << output.getSize() << " chunk: " << output.at(i)->getSize()<< std::endl;
-            std::cout << "Reserved output; iteration " << i << std::endl;
             result.append(*(output.at(i)));
-            std::cout << "Appended output; iteration " << i << std::endl;
         }
-        std::cout << "Appended output" << std::endl;
         return result;
     }
 
-    void Searcher::searchJob(const std::string &userInput, kyc::vector<std::shared_ptr<kyc::vector<std::string>>> & output_ptr)
+    void Searcher::searchJob(const std::string &userInput, kyc::vector<std::shared_ptr<kyc::vector<std::string>>> &output_ptr)
     {
         const int size = mData.getSize();
         mSearchFinished = false;
         std::shared_ptr<std::mutex> jobMutex = std::make_shared<std::mutex>();
         // Post jobs equal to number of working threads;
+        mTotalCounter = 0;
+        std::cout << "Total Size: " << mTotalSize << std::endl;
+
         for (int i = 0; i < mWorkerThreads; ++i)
         {
             std::shared_ptr<kyc::vector<std::string>> data = std::make_shared<kyc::vector<std::string>>(mData.at(i));
@@ -59,14 +62,16 @@ namespace kyc
             const auto job = [data, output, userInput, this]()
             {
                 const int size = data->getSize();
-                std::cout << "Data size: " << data->getSize() << "output size: " << output->getSize() << std::endl;
                 output->reserve(data->getSize());
                 int index{};
                 do
                 {
                     if (index == size) // Counter has been reached
                     {
-                        if (mThreadpool.idle())
+                        std::cout << "Final element " << index << std::endl;
+                        mTotalCounter += index;
+                        std::cout << "Total counter: " << mTotalCounter << std::endl;
+                        if (mThreadpool.idle() && mTotalCounter == mTotalSize)
                         {
                             notifyMainThread();
                         }
