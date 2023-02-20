@@ -32,12 +32,14 @@ namespace kyc
             mCV.wait(lock, [this]
                      { return mSearchFinished; });
         }
+        std::cout << "Finish job" <<std::endl;
         kyc::vector<std::string> output{};
-        for (int i = 0; i < output_ptr->getSize(); ++i)
+        for (int i = 0; i < mWorkerThreads; ++i)
         {
-            output.reserve(output_ptr->getSize());
+            output.reserve(output_ptr->at(i).getSize());
             output.append(output_ptr->at(i));
         }
+        std::cout << "Appended output" <<std::endl;
         return output;
     }
 
@@ -54,6 +56,7 @@ namespace kyc
             const auto job = [data, outputVector, userInput, this]()
             {
                 const int size = data->getSize();
+                std::cout << "Data size: " << data->getSize() << "output size: " << outputVector->getSize()  << std::endl;
                 outputVector->reserve(data->getSize());
                 int index{};
                 do

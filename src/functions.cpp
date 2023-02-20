@@ -130,7 +130,6 @@ namespace kyc
     for (int i = 0; i < nChunks; ++i)
     {
       kyc::vector<std::string> chunk{data.extract(i * chunkSize, chunkSize)};
-      std::cout << "Chunk size in iteration: " << i <<  " chunk size: " << chunk.getSize() << std::endl;
       chunkedData.push_back(chunk);
     }
     const int remainder = data.getSize() % nChunks;

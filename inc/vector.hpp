@@ -47,7 +47,6 @@ namespace kyc
 
     int constGetSize() const
     {
-      std::cout << "constGetSize " << mSize << std::endl;
       return mSize;
     }
 
@@ -68,7 +67,6 @@ namespace kyc
       T *newArray = new T[mSize];
       std::copy_n(input.constGet(), mSize, newArray);
       mArray.reset(newArray);
-      std::cout << "Copy constructor: " << mSize << std::endl;
     }
 
     vector &operator=(vector input)
@@ -118,7 +116,6 @@ namespace kyc
       T *newArray = new T[elements_to_copy];
       std::copy_n(mArray.get() + src_begin_index, elements_to_copy, newArray);
       vector output{newArray, elements_to_copy};
-      std::cout << "Extracted vector size: " << output.getSize() << std::endl;
       return output;
     }
 
