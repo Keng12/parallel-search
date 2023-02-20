@@ -51,7 +51,7 @@ namespace kyc
   void Threadpool::postJob(const std::function<void()> &job)
   {
     {
-      std::unique_lock<std::mutex> lock(mMutex);
+      std::lock_guard<std::mutex> const lock(mMutex);
       mJobQueue.push_back(job);
     }
     mCondVar.notify_one();
@@ -60,7 +60,7 @@ namespace kyc
   void Threadpool::stop()
   {
     {
-      std::unique_lock<std::mutex> lock(mMutex);
+      std::lock_guard<std::mutex> const lock(mMutex);
       mShutdown = true;
     }
     mCondVar.notify_all();

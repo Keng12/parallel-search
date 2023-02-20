@@ -85,7 +85,7 @@ namespace kyc
     void Searcher::notifyMainThread()
     {
         {
-            std::unique_lock<std::mutex> lock{mMutex};
+            std::lock_guard<std::mutex> const lock{mMutex};
             mSearchFinished = true;
         }
         mCV.notify_one();
