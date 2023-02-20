@@ -8,7 +8,7 @@
 #include <iostream>
 #include <memory>
 #include <numeric>
-#include <shared_mutex>
+#include <mutex>
 #include <thread>
 #include <vector>
 
@@ -16,15 +16,14 @@
 
 namespace kyc {
 class Threadpool {
-  std::shared_mutex mMutex{};
+  std::mutex mMutex{};
   std::vector<std::thread> mThreads{};
   std::vector<std::function<void()>> mJobQueue{};
   std::atomic_bool mShutdown{};
-  std::condition_variable_any mCondVar{}; // Allows threads to wait on new jobs or termination
+  std::condition_variable mCondVar{}; // Allows threads to wait on new jobs or termination
   int mWorkerThreads{};
 
 public:
-  bool idle();
   void start(int nWorkerThreads);
   void threadLoop();
   void postJob(const std::function<void()> &job);

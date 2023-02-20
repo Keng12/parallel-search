@@ -11,7 +11,7 @@
 namespace kyc
 {
     Searcher::Searcher(kyc::vector<kyc::vector<std::string>> &inputVector,
-                       std::condition_variable_any &mainCV, std::shared_mutex &mainMutex,
+                       std::condition_variable &mainCV, std::mutex &mainMutex,
                        bool &searchFinished, const int totalSize)
         : mData{inputVector}, mCV{mainCV}, mMainMutex{mainMutex},
           mSearchFinished{searchFinished}, mTotalSize{totalSize} {};
@@ -28,7 +28,7 @@ namespace kyc
         kyc::vector<std::shared_ptr<kyc::vector<std::string>>> output{};
         searchJob(userInput, output);
         {
-            std::unique_lock<std::shared_mutex> lock{mMainMutex};
+            std::unique_lock<std::mutex> lock{mMainMutex};
             mCV.wait(lock, [this]
                      { return mSearchFinished; });
         }
@@ -89,20 +89,10 @@ namespace kyc
     void Searcher::notifyMainThread()
     {
         {
-            std::unique_lock<std::shared_mutex> lock{mMainMutex};
+            std::unique_lock<std::mutex> lock{mMainMutex};
             mSearchFinished = true;
         }
         mCV.notify_one();
         return;
-    }
-
-    bool Searcher::getSearchFinished()
-    {
-        bool searchFinished{};
-        {
-            std::shared_lock<std::shared_mutex> lock{mMainMutex};
-            searchFinished = mSearchFinished;
-        }
-        return searchFinished;
     }
 }; // namespace kyc

@@ -18,8 +18,8 @@ namespace kyc
     kyc::Threadpool mThreadpool{};
     int mWorkerThreads{};
     kyc::vector<kyc::vector<std::string>> &mData;
-    std::condition_variable_any &mCV;
-    std::shared_mutex &mMainMutex;
+    std::condition_variable &mCV;
+    std::mutex &mMainMutex;
     bool &mSearchFinished;
     std::atomic<int> mTotalCounter{};
     const int mTotalSize{};
@@ -27,7 +27,7 @@ namespace kyc
 
   public:
     Searcher(kyc::vector<kyc::vector<std::string>> &inputVector,
-             std::condition_variable_any &mainCV, std::shared_mutex &mainMutex,
+             std::condition_variable &mainCV, std::mutex &mainMutex,
              bool &searchFinished, const int totalSize);
 
     void start(int n);

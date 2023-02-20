@@ -20,8 +20,8 @@ int main(int argc, char *argv[])
         auto [filename, counter] = kyc::getFilename(dir, basename);
         kyc::vector<std::string> data = kyc::setupData("input.txt");
         std::cout << "Data: " << data.getSize() << std::endl;
-        std::condition_variable_any condVar{};
-        std::shared_mutex mutex{};
+        std::condition_variable condVar{};
+        std::mutex mutex{};
         bool searchFinished{};
         kyc::vector<kyc::vector<std::string>> chunkedData = kyc::splitData(data, nThreads);
         std::cout << "Finish split data (main)" << std::endl;

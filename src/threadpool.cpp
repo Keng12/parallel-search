@@ -6,7 +6,7 @@
 #include <iostream>
 #include <memory>
 #include <numeric>
-#include <shared_mutex>
+#include <mutex>
 #include <thread>
 #include <vector>
 
@@ -34,7 +34,7 @@ namespace kyc
     {
       std::function<void()> job;
       {
-        std::unique_lock<std::shared_mutex> lock{mMutex};
+        std::unique_lock<std::mutex> lock{mMutex};
         mCondVar.wait(lock, [this]
                       { return !mJobQueue.empty() || mShutdown; });
         if (mShutdown)
@@ -51,7 +51,7 @@ namespace kyc
   void Threadpool::postJob(const std::function<void()> &job)
   {
     {
-      std::unique_lock<std::shared_mutex> lock(mMutex);
+      std::unique_lock<std::mutex> lock(mMutex);
       mJobQueue.push_back(job);
     }
     mCondVar.notify_one();
@@ -60,7 +60,7 @@ namespace kyc
   void Threadpool::stop()
   {
     {
-      std::unique_lock<std::shared_mutex> lock(mMutex);
+      std::unique_lock<std::mutex> lock(mMutex);
       mShutdown = true;
     }
     mCondVar.notify_all();
@@ -71,14 +71,4 @@ namespace kyc
   }
 
   int Threadpool::getNumberThreads() const { return mWorkerThreads; }
-
-  bool Threadpool::idle()
-  {
-    bool idle{};
-    {
-      std::shared_lock<std::shared_mutex> lock(mMutex);
-      idle = mJobQueue.empty();
-    }
-    return idle;
-  }
 }; // namespace kyc
