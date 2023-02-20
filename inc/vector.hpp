@@ -32,7 +32,6 @@ namespace kyc
 
     void reserve_nonlocking(const int n)
     {
-      std::cout << "Reserve: " << n << "  " << mCapacity << " " << mSize << std::endl;
       assert(n > mCapacity);
       T *newArray = new T[n];
       std::copy_n(mArray.get(), mSize, newArray);
@@ -48,7 +47,14 @@ namespace kyc
 
     int constGetSize() const
     {
+      std::cout << "constGetSize " << mSize << std::endl;
       return mSize;
+    }
+
+    std::unique_ptr<T[]> getUniquePtr()
+    {
+      std::shared_lock<std::shared_mutex> lock{mMutex};
+      return std::move(mArray);
     }
 
   public:
@@ -62,20 +68,21 @@ namespace kyc
       T *newArray = new T[mSize];
       std::copy_n(input.constGet(), mSize, newArray);
       mArray.reset(newArray);
+      std::cout << "Copy constructor: " << mSize << std::endl;
     }
 
-    vector &operator=(const vector &input) { return *this; }
-
-    int getCapacity()
+    vector &operator=(vector input)
     {
-      std::shared_lock<std::shared_mutex> lock{mMutex};
-      return mCapacity;
+      mSize = input.getSize();
+      mCapacity = mSize;
+      std::unique_ptr<T[]> tmpPtr = input.getUniquePtr();
+      mArray.swap(tmpPtr);
+      return *this;
     }
 
     T at(const int n)
     {
       std::shared_lock<std::shared_mutex> lock{mMutex};
-      std::cout << "n: " << n << " mSize: " << mSize << std::endl;
       assert(n >= 0 && n < mSize);
       return mArray[n];
     };
@@ -92,14 +99,14 @@ namespace kyc
       return mSize;
     }
 
-    void push_back(const T &string)
+    void push_back(const T &input)
     {
       std::unique_lock<std::shared_mutex> lock{mMutex};
       if (mSize == mCapacity)
       {
         reserve_nonlocking(mCapacityFactor * mCapacity + 1);
       }
-      mArray[mSize] = string;
+      mArray[mSize] = input;
       ++mSize;
       return;
     }
@@ -110,7 +117,9 @@ namespace kyc
       assert(elements_to_copy > 0 && elements_to_copy <= mSize && src_begin_index >= 0 && src_begin_index < mSize);
       T *newArray = new T[elements_to_copy];
       std::copy_n(mArray.get() + src_begin_index, elements_to_copy, newArray);
-      return vector{newArray, elements_to_copy};
+      vector output{newArray, elements_to_copy};
+      std::cout << "Extracted vector size: " << output.getSize() << std::endl;
+      return output;
     }
 
     // Pass by value -> appendage has to be copied, otherwise can be changed externally

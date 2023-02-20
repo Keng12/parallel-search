@@ -127,20 +127,19 @@ namespace kyc
     kyc::vector<kyc::vector<std::string>> chunkedData{};
     chunkedData.reserve(nChunks);
     const int chunkSize = data.getSize() / nChunks;
-    std::cout << "Chunk size: " << chunkSize << " Data size: " << data.getSize() << std::endl;
     for (int i = 0; i < nChunks; ++i)
     {
-      kyc::vector<std::string> chunk{};
-      chunk = data.extract(i * chunkSize, chunkSize);
+      kyc::vector<std::string> chunk{data.extract(i * chunkSize, chunkSize)};
+      std::cout << "Chunk size in iteration: " << i <<  " chunk size: " << chunk.getSize() << std::endl;
       chunkedData.push_back(chunk);
     }
     const int remainder = data.getSize() % nChunks;
     if (remainder > 0)
     {
-      kyc::vector<std::string> chunk{};
-      chunk = data.extract(nChunks * chunkSize, remainder);
+      kyc::vector<std::string> chunk{data.extract(nChunks * chunkSize, remainder)};
       chunkedData.push_back(chunk);
     }
+    std::cout << "Chunked data function: " << chunkedData.at(0).getSize() << std::endl;
     return chunkedData;
   }
 } // namespace kyc

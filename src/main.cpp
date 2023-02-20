@@ -23,8 +23,8 @@ int main(int argc, char *argv[])
         std::condition_variable_any condVar{};
         std::shared_mutex mutex{};
         bool searchFinished{};
-        std::cout << nThreads << std::endl;
         kyc::vector<kyc::vector<std::string>> chunkedData = kyc::splitData(data, nThreads);
+        std::cout << "Finish split data (main)" << std::endl;
         kyc::Searcher searcher{chunkedData, condVar, mutex, searchFinished};
         searcher.start(nThreads);
         while (true)

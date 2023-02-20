@@ -19,7 +19,7 @@ namespace kyc
   {
     assert(nWorkerThreads > 0);
     mWorkerThreads = nWorkerThreads;
-    std::cout << "Threadpool: no threads: " << mWorkerThreads << std::endl;
+    std::cout << "Threadpool: No. of threads: " << mWorkerThreads << std::endl;
     mThreads.reserve(mWorkerThreads);
     mJobQueue.reserve(mWorkerThreads);
     for (int i = 0; i < mWorkerThreads; ++i)
