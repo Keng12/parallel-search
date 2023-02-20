@@ -75,7 +75,7 @@ namespace kyc
     T at(const int n)
     {
       std::shared_lock<std::shared_mutex> lock{mMutex};
-      std::cout << "n: " << n << "mSize: " << mSize << std::endl;
+      std::cout << "n: " << n << " mSize: " << mSize << std::endl;
       assert(n >= 0 && n < mSize);
       return mArray[n];
     };

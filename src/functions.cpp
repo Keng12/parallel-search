@@ -123,6 +123,7 @@ namespace kyc
 
   kyc::vector<kyc::vector<std::string>> splitData(kyc::vector<std::string> data, const int nChunks)
   {
+    assert(nChunks > 0);
     kyc::vector<kyc::vector<std::string>> chunkedData{};
     chunkedData.reserve(nChunks);
     const int chunkSize = data.getSize() / nChunks;
