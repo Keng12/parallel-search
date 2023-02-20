@@ -25,7 +25,7 @@ namespace kyc
       return mArray.get();
     }
 
-    T *getConst() const
+    T *constGet() const
     {
       return mArray.get();
     }
@@ -46,7 +46,7 @@ namespace kyc
       mArray.reset(input_ptr);
     }
 
-    int getSizeConst() const
+    int constGetSize() const
     {
       return mSize;
     }
@@ -57,10 +57,10 @@ namespace kyc
       mArray = std::make_unique<T[]>(mCapacity);
     }
 
-    vector(const vector &input) : mSize{input.getSizeConst()}, mCapacity{input.getSizeConst()}, mCapacityFactor{2}
+    vector(const vector &input) : mSize{input.constGetSize()}, mCapacity{input.constGetSize()}, mCapacityFactor{2}
     {
       T *newArray = new T[mSize];
-      std::copy_n(input.getConst(), mSize, newArray);
+      std::copy_n(input.constGet(), mSize, newArray);
       mArray.reset(newArray);
     }
 
