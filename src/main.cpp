@@ -19,9 +19,11 @@ int main(int argc, char *argv[])
         std::string const dir{"results"};
         auto [filename, counter] = kyc::getFilename(dir, basename);
         kyc::vector<std::string> data = kyc::setupData("input.txt");
+        std::cout << "Data: " << data.getSize() << std::endl;
         std::condition_variable_any condVar{};
         std::shared_mutex mutex{};
         bool searchFinished{};
+        std::cout << nThreads << std::endl;
         kyc::vector<kyc::vector<std::string>> chunkedData = kyc::splitData(data, nThreads);
         kyc::Searcher searcher{chunkedData, condVar, mutex, searchFinished};
         searcher.start(nThreads);

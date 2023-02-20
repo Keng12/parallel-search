@@ -25,9 +25,14 @@ namespace kyc
       return mArray.get();
     }
 
-    void reserve_nonlocking(int n)
+    T *getConst() const
     {
-      std::cout << n << "  " << mCapacity << " " << mSize << std::endl;
+      return mArray.get();
+    }
+
+    void reserve_nonlocking(const int n)
+    {
+      std::cout << "Reserve: " << n << "  " << mCapacity << " " << mSize << std::endl;
       assert(n > mCapacity);
       T *newArray = new T[n];
       std::copy_n(mArray.get(), mSize, newArray);
@@ -35,10 +40,15 @@ namespace kyc
       mCapacity = n;
     }
 
-    vector(T *input_ptr, int size) : mSize{size}, mCapacity{size}, mCapacityFactor{2}
+    vector(T *input_ptr, const int size) : mSize{size}, mCapacity{size}, mCapacityFactor{2}
     {
       assert(size > 0);
       mArray.reset(input_ptr);
+    }
+
+    int getSizeConst() const
+    {
+      return mSize;
     }
 
   public:
@@ -47,7 +57,12 @@ namespace kyc
       mArray = std::make_unique<T[]>(mCapacity);
     }
 
-    vector(const vector &) {}
+    vector(const vector &input) : mSize{input.getSizeConst()}, mCapacity{input.getSizeConst()}, mCapacityFactor{2}
+    {
+      T *newArray = new T[mSize];
+      std::copy_n(input.getConst(), mSize, newArray);
+      mArray.reset(newArray);
+    }
 
     vector &operator=(const vector &a) { return *this; }
 
@@ -57,14 +72,14 @@ namespace kyc
       return mCapacity;
     }
 
-    T at(int n)
+    T at(const int n)
     {
       std::shared_lock<std::shared_mutex> lock{mMutex};
       assert(n > 0 && n < mSize);
       return mArray[n];
     };
 
-    void reserve(int n)
+    void reserve(const int n)
     {
       std::unique_lock<std::shared_mutex> lock{mMutex};
       reserve_nonlocking(n);
