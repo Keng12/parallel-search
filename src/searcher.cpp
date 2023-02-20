@@ -58,12 +58,12 @@ namespace kyc
                 int index{};
                 do
                 {
-                    if (index == size) // Counter has been reached
+                    if (size == index) // Counter has been reached
                     {
                         std::cout << "Final element " << index << std::endl;
                         mTotalCounter += index;
                         std::cout << "Total counter: " << mTotalCounter << std::endl;
-                        if (mTotalCounter == mTotalSize)
+                        if (mTotalSize == mTotalCounter)
                         {
                             notifyMainThread();
                         }
