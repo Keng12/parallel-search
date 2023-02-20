@@ -64,7 +64,7 @@ namespace kyc
       mArray.reset(newArray);
     }
 
-    vector &operator=(const vector &a) { return *this; }
+    vector &operator=(const vector &input) { return *this; }
 
     int getCapacity()
     {
