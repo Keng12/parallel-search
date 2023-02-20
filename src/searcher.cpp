@@ -30,8 +30,8 @@ namespace kyc
                      { return mSearchFinished; });
         }
         std::cout << "Finish job" << std::endl;
-        kyc::vector<std::string> result{};
-        for (int i = 0; i < mWorkerThreads; ++i)
+        kyc::vector<std::string> result{*(output.at(0))};
+        for (int i = 1; i < mWorkerThreads; ++i)
         {
             result.append(*(output.at(i)));
         }

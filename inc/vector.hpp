@@ -21,7 +21,7 @@ namespace kyc
 
     T *get()
     {
-      std::shared_lock<std::shared_mutex> lock{mMutex};
+    //  std::shared_lock<std::shared_mutex> lock{mMutex};
       return mArray.get();
     }
 
@@ -52,7 +52,7 @@ namespace kyc
 
     std::unique_ptr<T[]> moveUniquePtr()
     {
-      std::shared_lock<std::shared_mutex> lock{mMutex};
+    //  std::shared_lock<std::shared_mutex> lock{mMutex};
       return std::move(mArray);
     }
 
@@ -80,26 +80,26 @@ namespace kyc
 
     T at(const int n)
     {
-      std::shared_lock<std::shared_mutex> lock{mMutex};
+    //  std::shared_lock<std::shared_mutex> lock{mMutex};
       assert(n >= 0 && n < mSize);
       return mArray[n];
     };
 
     void reserve(const int n)
     {
-      std::unique_lock<std::shared_mutex> lock{mMutex};
+    //  std::unique_lock<std::shared_mutex> lock{mMutex};
       reserve_nonlocking(n);
     }
 
     int getSize()
     {
-      std::shared_lock<std::shared_mutex> lock{mMutex};
+    //  std::shared_lock<std::shared_mutex> lock{mMutex};
       return mSize;
     }
 
     void push_back(const T &input)
     {
-      std::unique_lock<std::shared_mutex> lock{mMutex};
+    //  std::unique_lock<std::shared_mutex> lock{mMutex};
       if (mSize == mCapacity)
       {
         reserve_nonlocking(mCapacityFactor * mCapacity + 1);
@@ -111,7 +111,7 @@ namespace kyc
 
     vector extract(const int src_begin_index, const int elements_to_copy)
     {
-      std::shared_lock<std::shared_mutex> lock{mMutex};
+    //  std::shared_lock<std::shared_mutex> lock{mMutex};
       assert(elements_to_copy > 0 && elements_to_copy <= mSize && src_begin_index >= 0 && src_begin_index < mSize);
       T *newArray = new T[elements_to_copy];
       std::copy_n(mArray.get() + src_begin_index, elements_to_copy, newArray);
@@ -122,7 +122,7 @@ namespace kyc
     // Pass by value -> appendage has to be copied, otherwise can be changed externally
     void append(vector appendage)
     {
-      std::unique_lock<std::shared_mutex> lock{mMutex};
+    //  std::unique_lock<std::shared_mutex> lock{mMutex};
       T *newArray = new T[mSize + appendage.getSize()];
       std::copy_n(mArray.get(), mSize, newArray);
       std::copy_n(appendage.get(), appendage.getSize(), newArray + mSize);
