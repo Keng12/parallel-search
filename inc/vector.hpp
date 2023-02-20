@@ -51,7 +51,7 @@ namespace kyc
       return mSize;
     }
 
-    std::unique_ptr<T[]> getUniquePtr()
+    std::unique_ptr<T[]> moveUniquePtr()
     {
       std::shared_lock<std::shared_mutex> lock{mMutex};
       return std::move(mArray);
@@ -75,7 +75,7 @@ namespace kyc
     {
       mSize = input.getSize();
       mCapacity = mSize;
-      std::unique_ptr<T[]> tmpPtr = input.getUniquePtr();
+      std::unique_ptr<T[]> tmpPtr = input.moveUniquePtr();
       mArray.swap(tmpPtr);
       return *this;
     }
