@@ -10,11 +10,8 @@
 // No: Pop and continue
 namespace kyc
 {
-    Searcher::Searcher(kyc::vector<kyc::vector<std::string>> &inputVector,
-                       std::condition_variable &mainCV, std::mutex &mainMutex,
-                       bool &searchFinished, const int totalSize)
-        : mData{inputVector}, mCV{mainCV}, mMainMutex{mainMutex},
-          mSearchFinished{searchFinished}, mTotalSize{totalSize} {};
+    Searcher::Searcher(kyc::vector<kyc::vector<std::string>> &inputVector, const int totalSize)
+        : mData{inputVector}, mTotalSize{totalSize} {};
 
     void Searcher::start(int n)
     {
@@ -28,7 +25,7 @@ namespace kyc
         kyc::vector<std::shared_ptr<kyc::vector<std::string>>> output{};
         searchJob(userInput, output);
         {
-            std::unique_lock<std::mutex> lock{mMainMutex};
+            std::unique_lock<std::mutex> lock{mMutex};
             mCV.wait(lock, [this]
                      { return mSearchFinished; });
         }
@@ -45,7 +42,6 @@ namespace kyc
     {
         const int size = mData.getSize();
         mSearchFinished = false;
-        std::shared_ptr<std::mutex> jobMutex = std::make_shared<std::mutex>();
         // Post jobs equal to number of working threads;
         mTotalCounter = 0;
         std::cout << "Total Size: " << mTotalSize << std::endl;
@@ -89,7 +85,7 @@ namespace kyc
     void Searcher::notifyMainThread()
     {
         {
-            std::unique_lock<std::mutex> lock{mMainMutex};
+            std::unique_lock<std::mutex> lock{mMutex};
             mSearchFinished = true;
         }
         mCV.notify_one();
