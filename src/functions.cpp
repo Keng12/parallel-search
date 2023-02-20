@@ -121,31 +121,26 @@ namespace kyc
     return nThreads;
   }
 
-  kyc::vector<kyc::vector<std::string>> splitData(kyc::vector<std::string> data, int nThreads)
+  kyc::vector<kyc::vector<std::string>> splitData(kyc::vector<std::string> data, int nChunks)
   {
-    assert(nThreads > 0);
+    assert(nChunks > 0);
     // Check if nThreads > data size()
-    const int chunkSize = data.getSize() / nThreads;
+    const int chunkSize = data.getSize() / nChunks;
     kyc::vector<kyc::vector<std::string>> chunkedData{};
-    chunkedData.reserve(nThreads);
-    const int remainder = data.getSize() - chunkSize * nThreads;
-    int nIteration{};
-    if (remainder > 0)
-    {
-      kyc::vector<std::string> chunk{data.extract(0, remainder)};
-      chunkedData.push_back(chunk);
-      nIteration = nThreads - 1;
-    }
-    else
-    {
-      nIteration = nThreads;
-    }
-    std::cout << "Chunksize: " << chunkSize << std::endl;
-    std::cout << "remainder: " << remainder << std::endl;
-
-    for (int i = 0; i < nIteration; ++i)
+    chunkedData.reserve(nChunks);
+    const int remainder = data.getSize() - chunkSize * nChunks;
+    for (int i = 0; i < nChunks; ++i)
     {
       kyc::vector<std::string> chunk{data.extract(i * chunkSize + remainder, chunkSize)};
+      if (nChunks - 1 == i)
+      {
+        chunk = data.extract(i * chunkSize, chunkSize + remainder);
+      }
+      else
+      {
+        chunk = data.extract(i * chunkSize, chunkSize);
+      }
+      std::cout << "Chunk size: " << chunk.getSize() <<std::endl;
       chunkedData.push_back(chunk);
     }
     std::cout << "No of chunks: " << chunkedData.getSize() << std::endl;
