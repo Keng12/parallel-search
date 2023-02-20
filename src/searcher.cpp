@@ -23,60 +23,55 @@ namespace kyc
         mWorkerThreads = mThreadpool.getNumberThreads();
     };
 
-    void Searcher::searchJob(std::shared_ptr<std::string> userInput)
+    kyc::vector<std::string> Searcher::search(const std::string &userInput)
+    {
+        std::shared_ptr<kyc::vector<kyc::vector<std::string>>> output_ptr = std::make_shared<kyc::vector<kyc::vector<std::string>>>();
+        searchJob(userInput, output_ptr);
+        {
+            std::unique_lock<std::shared_mutex> lock{mMainMutex};
+            mCV.wait(lock, [this]
+                     { return mSearchFinished; });
+        }
+        kyc::vector<std::string> output{};
+        for (int i = 0; i < output_ptr->getSize(); ++i)
+        {
+            output.reserve(output_ptr->getSize());
+            output.append(output_ptr->at(i));
+        }
+        return output;
+    }
+
+    void Searcher::searchJob(const std::string &userInput, std::shared_ptr<kyc::vector<kyc::vector<std::string>>> output_ptr)
     {
         const int size = mData.getSize();
         mSearchFinished = false;
-        std::shared_ptr<int> counter = std::make_shared<int>(0);
         std::shared_ptr<std::mutex> jobMutex = std::make_shared<std::mutex>();
         // Post jobs equal to number of working threads;
         for (int i = 0; i < mWorkerThreads; ++i)
         {
             std::shared_ptr<kyc::vector<std::string>> data = std::make_shared<kyc::vector<std::string>>(mData.at(i));
             std::shared_ptr<kyc::vector<std::string>> outputVector = std::make_shared<kyc::vector<std::string>>();
-            const auto job = [data, outputVector, userInput]()
+            const auto job = [data, outputVector, userInput, this]()
             {
+                const int size = data->getSize();
                 outputVector->reserve(data->getSize());
+                int index{};
                 do
                 {
-                    int index{};
-                    bool finished{};
+                    if (index == size) // Counter has been reached
                     {
-                        std::lock_guard<std::mutex> lock{*jobMutex};
-                        if (size == *counter) // Counter has been reached
+                        if (mThreadpool.idle())
                         {
-                            // If counter has been reached but jobs are still running -> Possible that elements are processing -> do not notify yet
-                            if (mThreadpool.idle() && !getSearchFinished())
-                            {
-                                // Final job and counter has been reached -> notify main thread
-                                // Necessary if job processing final element is not the final job in queue
-                                notifyMainThread();
-                            }
-                            return;
+                            notifyMainThread();
                         }
-                        else
-                        {
-                            index = *counter;
-                            ++(*counter);
-                            if (size == *counter) // Processing last element -> Notify main thread afterwards
-                            {
-                                finished = true; // Set local boolean
-                            }
-                        }
+                        return;
                     }
-                    std::string element{mData.at(index)};
-                    if (0 == element.rfind(*userInput, 0))
+                    std::string element{data->at(index)};
+                    if (0 == element.rfind(element, 0))
                     {
-                        outputVector->push_back(element);
+                        outputVector->push_back(std::move(element));
                     }
-                    // Check if BOTH finished and last job
-                    // Possible: Finished but not final job (e.g. if previous jobs still
-                    // processing) or final job but not finished yet (e.g. during startup)
-                    if (finished && mThreadpool.idle())
-                    {
-                        notifyMainThread(); // Set boolean for main thread AFTER pushing back element
-                    }
-                    // In case final job is not final element to be processed -> Still cancel while loop
+                    ++index;
                 } while (!getSearchFinished());
             };
             mThreadpool.postJob(job);

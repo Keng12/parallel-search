@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <cmath>
 
 #include "functions.hpp"
 #include "vector.hpp"
@@ -13,6 +14,7 @@ namespace kyc
   {
     std::filesystem::path file{filename};
     kyc::vector<std::string> data{};
+    data.reserve(std::pow(26, 4));
     if (!std::filesystem::exists(file))
     {
       std::cout << "Create input data" << std::endl;
@@ -53,6 +55,7 @@ namespace kyc
     }
     return data;
   }
+
   std::tuple<std::string, int> getFilename(std::string const &dir,
                                            std::string const &basename)
   {
@@ -115,5 +118,26 @@ namespace kyc
       }
     }
     return nThreads;
+  }
+
+  kyc::vector<kyc::vector<std::string>> splitData(kyc::vector<std::string> data, const int nChunks)
+  {
+    kyc::vector<kyc::vector<std::string>> chunkedData{};
+    chunkedData.reserve(nChunks);
+    const int chunkSize = data.getSize() / nChunks;
+    for (int i = 0; i < nChunks; ++i)
+    {
+      kyc::vector<std::string> chunk{};
+      chunk = data.extract(i * chunkSize, chunkSize);
+      chunkedData.push_back(chunk);
+    }
+    const int remainder = data.getSize() % nChunks;
+    if (remainder > 0)
+    {
+      kyc::vector<std::string> chunk{};
+      chunk = data.extract(nChunks * chunkSize, remainder);
+      chunkedData.push_back(chunk);
+    }
+    return chunkedData;
   }
 } // namespace kyc

@@ -28,8 +28,8 @@ public:
            bool &searchFinished);
 
   void start(int n);
-  void searchJob(std::shared_ptr<kyc::vector<std::string>> outputVector,
-                 std::shared_ptr<std::string> userInput);
+  void searchJob(const std::string &userInput, std::shared_ptr<kyc::vector<kyc::vector<std::string>>> output_ptr);
+  kyc::vector<std::string> search(const std::string &userInput);               
   void stop();
   void notifyMainThread();
 };

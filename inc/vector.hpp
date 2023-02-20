@@ -42,7 +42,7 @@ namespace kyc
     }
 
   public:
-    vector() : mSize{0}, mCapacity{1}, mCapacityFactor{2}
+    vector() : mSize{0}, mCapacity{0}, mCapacityFactor{2}
     {
       mArray = std::make_unique<T[]>(mCapacity);
     }
@@ -81,7 +81,7 @@ namespace kyc
       std::unique_lock<std::shared_mutex> lock{mMutex};
       if (mSize == mCapacity)
       {
-        reserve_nonlocking(mCapacityFactor * mCapacity);
+        reserve_nonlocking(mCapacityFactor * mCapacity + 1);
       }
       mArray[mSize] = string;
       ++mSize;

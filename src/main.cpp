@@ -19,48 +19,23 @@ int main(int argc, char *argv[])
         std::string const dir{"results"};
         auto [filename, counter] = kyc::getFilename(dir, basename);
         kyc::vector<std::string> data = kyc::setupData("input.txt");
-        kyc::vector<kyc::vector<std::string>> chunkedData{};
-        if (chunkedData.getCapacity() < nThreads)
-        {
-            chunkedData.reserve(nThreads);
-        }
-        const int chunkSize = data.getSize() / nThreads;
-        for (int i = 0; i < nThreads; ++i)
-        {
-            kyc::vector<std::string> chunk{};
-            chunk = data.extract(i * chunkSize, chunkSize);
-            chunkedData.push_back(chunk);
-        }
-        const int remainder = data.getSize() % nThreads;
-        if (remainder > 0)
-        {
-            kyc::vector<std::string> chunk{};
-            chunk = data.extract(nThreads * chunkSize, remainder);
-            chunkedData.push_back(chunk);
-        }
         std::condition_variable_any condVar{};
         std::shared_mutex mutex{};
         bool searchFinished{};
+        kyc::vector<kyc::vector<std::string>> chunkedData = kyc::splitData(data, nThreads);
         kyc::Searcher searcher{chunkedData, condVar, mutex, searchFinished};
         searcher.start(nThreads);
         while (true)
         {
             // During incremental search the input will be received via an event handler
-            std::string in{};
+            std::string input{};
             std::cout << "Enter search string:" << std::endl;
-            std::cin >> in;
-            if ("0" != in)
+            std::cin >> input;
+            if ("0" != input)
             {
-                std::cout << "Searching for: " << in << std::endl;
-                std::shared_ptr<std::string> userInput = std::make_shared<std::string>(in);
-                std::shared_ptr<kyc::vector<std::string>> output = std::make_shared<kyc::vector<std::string>>();
+                std::cout << "Searching for: " << input << std::endl;
                 auto const startTime = std::chrono::steady_clock::now();
-                searcher.searchJob(output, userInput);
-                {
-                    std::unique_lock<std::shared_mutex> lock{mutex};
-                    condVar.wait(lock, [&searchFinished]
-                                 { return searchFinished; });
-                }
+                kyc::vector<std::string> results = searcher.search(input);
                 const std::chrono::duration<double> elapsedTime = std::chrono::steady_clock::now() - startTime;
                 std::cout << "Search time: " << elapsedTime.count() << " seconds. Size: " << output->getSize() << std::endl;
                 std::stringstream ss{};
@@ -72,7 +47,7 @@ int main(int argc, char *argv[])
                 out << ss.str();
                 ++counter;
                 filename = dir + "/" + basename + std::to_string(counter) + ".txt";
-                std::cout << "Wrote search results of " << in << " in: " << filename << std::endl;
+                std::cout << "Wrote search results of " << input << " in: " << filename << std::endl;
             }
             else
             {
