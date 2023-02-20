@@ -37,11 +37,11 @@ int main(int argc, char *argv[])
                 auto const startTime = std::chrono::steady_clock::now();
                 kyc::vector<std::string> results = searcher.search(input);
                 const std::chrono::duration<double> elapsedTime = std::chrono::steady_clock::now() - startTime;
-                std::cout << "Search time: " << elapsedTime.count() << " seconds. Size: " << output->getSize() << std::endl;
+                std::cout << "Search time: " << elapsedTime.count() << " seconds. Count: " << results.getSize() << std::endl;
                 std::stringstream ss{};
-                for (int i = 0; i < output->getSize(); ++i)
+                for (int i = 0; i < results.getSize(); ++i)
                 {
-                    ss << output->at(i) << "\n";
+                    ss << results.at(i) << "\n";
                 }
                 std::ofstream out{filename};
                 out << ss.str();

@@ -97,7 +97,8 @@ namespace kyc
       return vector{newArray, elements_to_copy};
     }
 
-    void append(const vector &appendage)
+    // Pass by value -> appendage has to be copied, otherwise can be changed externally
+    void append(vector appendage)
     {
       std::unique_lock<std::shared_mutex> lock{mMutex};
       T *newArray = new T[mSize + appendage.getSize()];
