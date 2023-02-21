@@ -44,9 +44,9 @@ int main(int argc, char *argv[])
                 }
                 std::ofstream out{filename};
                 out << ss.str();
+                std::cout << "Wrote search results of " << input << " in: " << filename << std::endl;
                 ++counter;
                 filename = basename + std::to_string(counter) + ".txt";
-                std::cout << "Wrote search results of " << input << " in: " << filename << std::endl;
             }
             else
             {
