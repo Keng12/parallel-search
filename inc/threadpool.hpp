@@ -27,7 +27,6 @@ namespace kyc
     bool mStarted{};
 
   public:
-    Threadpool();
     Threadpool(int nWorkerThreads);
     ~Threadpool();
     void start(int const nWorkerThreads);

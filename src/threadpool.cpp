@@ -82,10 +82,10 @@ namespace kyc
       {
         thread.join();
       }
+      mThreads.clear();
+      mJobQueue.clear();
+      mStarted = false;
     }
-    mThreads.clear();
-    mJobQueue.clear();
-    mStarted = false;
   }
   int Threadpool::getNumberThreads() const { return mWorkerThreads; }
 }; // namespace kyc
