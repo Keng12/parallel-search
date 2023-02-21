@@ -16,10 +16,10 @@ namespace kyc
     return f.good();
   }
 
-  kyc::vector<std::string> setupData(std::string const &filename)
+  std::shared_ptr<kyc::vector<std::string>> setupData(std::string const &filename)
   {
-    kyc::vector<std::string> data{};
-    data.reserve(std::pow(26, 4));
+    std::shared_ptr<kyc::vector<std::string>> data = std::make_shared<kyc::vector<std::string>>();
+    data->reserve(std::pow(26, 4));
     if (!fileExists(filename))
     {
       std::cout << "Create input data" << std::endl;
@@ -39,7 +39,7 @@ namespace kyc
             {
               ss << alphabet.at(i) << alphabet.at(j) << alphabet.at(k)
                  << alphabet.at(l);
-              data.push_back(ss.str());
+              data->push_back(ss.str());
               output << ss.str() << '\n';
               ss.str("");
               ss.clear();
@@ -55,7 +55,7 @@ namespace kyc
       std::string line{};
       while (std::getline(input, line))
       {
-        data.push_back(line);
+        data->push_back(line);
       }
     }
     return data;

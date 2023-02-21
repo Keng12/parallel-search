@@ -11,7 +11,7 @@
 
 namespace kyc
 {
-    kyc::vector<std::string> setupData(std::string const &filename);
+    std::shared_ptr<kyc::vector<std::string>> setupData(std::string const &filename);
     std::pair<std::string, int> getFilename(std::string const &basename);
     int parseInput(const int argc, char **argv);
     kyc::vector<kyc::vector<std::string>> splitData(kyc::vector<std::string> data, const int nChunks);

@@ -19,9 +19,8 @@ int main(int argc, char *argv[])
         std::pair<std::string, int> filedata = kyc::getFilename(basename);
         std::string filename = filedata.first;
         int counter = filedata.second;
-        kyc::vector<std::string> data = kyc::setupData("input.txt");
-        kyc::vector<kyc::vector<std::string>> chunkedData = kyc::splitData(data, nThreads);
-        kyc::Searcher searcher{chunkedData, data.getSize(), nThreads};
+        std::shared_ptr<kyc::vector<std::string>> data = kyc::setupData("input.txt");
+        kyc::Searcher searcher{nThreads};
         while (true)
         {
             // During incremental search the input will be received via an event handler
@@ -32,7 +31,7 @@ int main(int argc, char *argv[])
             {
                 std::cout << "Searching for: " << input << std::endl;
                 auto const startTime = std::chrono::steady_clock::now();
-                std::shared_ptr<kyc::vector<std::string>> const results = searcher.search(input);
+                std::shared_ptr<kyc::vector<std::string>> const results = searcher.search(data, input);
                 const std::chrono::duration<double> elapsedTime = std::chrono::steady_clock::now() - startTime;
                 std::cout << "Search time: " << elapsedTime.count() << " seconds. Count: " << results->getSize() << std::endl;
                 std::stringstream ss{};

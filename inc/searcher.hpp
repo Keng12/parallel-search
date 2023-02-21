@@ -17,17 +17,16 @@ namespace kyc
   {
     kyc::Threadpool mThreadpool{};
     int mWorkerThreads{};
-    kyc::vector<kyc::vector<std::string>> &mData;
     std::condition_variable mCV{};
     std::mutex mMutex{};
     bool mSearchFinished{};
     std::atomic<int> mTotalCounter{};
-    const int mTotalSize{};
+    int mTotalSize{};
 
   public:
-    Searcher(kyc::vector<kyc::vector<std::string>> &inputVector, const int totalSize, const int nThreads);
-    void searchJob(const std::string &userInput, std::shared_ptr<kyc::vector<std::string>> output_ptr);
-    std::shared_ptr<kyc::vector<std::string>> search(const std::string &userInput);
+    Searcher(const int nThreads);
+    void searchJob(std::shared_ptr<kyc::vector<std::string>> inputData, const std::string &userInput, std::shared_ptr<kyc::vector<std::string>> output_ptr);
+    std::shared_ptr<kyc::vector<std::string>> search(std::shared_ptr<kyc::vector<std::string>> inputData, const std::string &userInput);
     void stop();
     void notifyMainThread();
   };

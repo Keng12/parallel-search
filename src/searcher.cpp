@@ -10,18 +10,18 @@
 // No: Pop and continue
 namespace kyc
 {
-    Searcher::Searcher(kyc::vector<kyc::vector<std::string>> &inputVector, const int totalSize, const int nThreads)
-        : mData{inputVector}, mTotalSize{totalSize}, mThreadpool{nThreads}, mWorkerThreads{nThreads}
+    Searcher::Searcher(const int nThreads) : mThreadpool{nThreads}, mWorkerThreads{nThreads}
     {
         assert(nThreads > 0);
     };
 
-    std::shared_ptr<kyc::vector<std::string>> Searcher::search(const std::string &userInput)
+    std::shared_ptr<kyc::vector<std::string>> Searcher::search(std::shared_ptr<kyc::vector<std::string>> inputData, const std::string &userInput)
     {
         mSearchFinished = false;
         mTotalCounter = 0;
+        mTotalSize = inputData->getSize();
         std::shared_ptr<kyc::vector<std::string>> output = std::make_shared<kyc::vector<std::string>>();
-        searchJob(userInput, output);
+        searchJob(inputData, userInput, output);
         {
             std::unique_lock<std::mutex> lock{mMutex};
             mCV.wait(lock, [this]
@@ -31,25 +31,34 @@ namespace kyc
         return output;
     }
 
-    void Searcher::searchJob(const std::string &userInput, std::shared_ptr<kyc::vector<std::string>> output_ptr)
+    void Searcher::searchJob(std::shared_ptr<kyc::vector<std::string>> inputData, const std::string &userInput, std::shared_ptr<kyc::vector<std::string>> output_ptr)
     {
         std::shared_ptr<std::mutex> jobMutex = std::make_shared<std::mutex>();
+        const int chunkSize = inputData->getSize() / mWorkerThreads;
+        const int remainder = inputData->getSize() - chunkSize * mWorkerThreads;
+
         // Post jobs equal to number of working threads;
         for (int i = 0; i < mWorkerThreads; ++i)
         {
-            const auto job = [output_ptr, userInput, i, jobMutex, this]()
+            const auto job = [inputData, output_ptr, userInput, i, jobMutex, chunkSize, remainder, this]()
             {
-                kyc::vector<std::string> const tmpData{mData.at(i)};
+                kyc::vector<std::string> tmpData{};
+                if (0 == i)
+                {
+                    tmpData = inputData->extract(0, chunkSize + remainder);
+                }
+                else
+                {
+                    tmpData = inputData->extract(i * chunkSize + remainder, chunkSize);
+                }
                 const int size = tmpData.getSize();
                 kyc::vector<std::string> tmpOutput{};
                 tmpOutput.reserve(size);
                 int index{};
-
                 do
                 {
                     if (size == index) // Counter has been reached
                     {
-
                         mTotalCounter += index;
                         {
                             std::lock_guard<std::mutex> const lock{*jobMutex};
