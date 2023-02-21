@@ -16,7 +16,7 @@ namespace kyc
   class Searcher
   {
     kyc::Threadpool mThreadpool{};
-    int mWorkerThreads{};
+    int const mWorkerThreads{};
     std::condition_variable mCV{};
     std::mutex mMutex{};
     bool mSearchFinished{};
