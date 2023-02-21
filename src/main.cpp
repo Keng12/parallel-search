@@ -20,9 +20,7 @@ int main(int argc, char *argv[])
         std::string filename = filedata.first;
         int counter = filedata.second;
         kyc::vector<std::string> data = kyc::setupData("input.txt");
-        std::cout << "Data: " << data.getSize() << std::endl;
         kyc::vector<kyc::vector<std::string>> chunkedData = kyc::splitData(data, nThreads);
-        std::cout << "Finish split data (main)" << std::endl;
         kyc::Searcher searcher{chunkedData, data.getSize(), nThreads};
         while (true)
         {

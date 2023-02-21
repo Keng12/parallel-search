@@ -58,7 +58,6 @@ namespace kyc
         data.push_back(line);
       }
     }
-    std::cout << "Returning: " << data.getSize() << std::endl;
     return data;
   }
 
@@ -142,10 +141,8 @@ namespace kyc
       {
         chunk = data.extract(i * chunkSize + remainder, chunkSize);
       }
-      std::cout << "Chunk size: " << chunk.getSize() << std::endl;
       chunkedData.push_back(chunk);
     }
-    std::cout << "No of chunks: " << chunkedData.getSize() << std::endl;
     return chunkedData;
   }
 } // namespace kyc
