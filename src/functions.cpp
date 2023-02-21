@@ -121,28 +121,4 @@ namespace kyc
     }
     return nThreads;
   }
-
-  kyc::vector<kyc::vector<std::string>> splitData(kyc::vector<std::string> data, int nChunks)
-  {
-    assert(nChunks > 0);
-    // Check if nThreads > data size()
-    const int chunkSize = data.getSize() / nChunks;
-    kyc::vector<kyc::vector<std::string>> chunkedData{};
-    chunkedData.reserve(nChunks);
-    const int remainder = data.getSize() - chunkSize * nChunks;
-    for (int i = 0; i < nChunks; ++i)
-    {
-      kyc::vector<std::string> chunk{data.extract(i * chunkSize + remainder, chunkSize)};
-      if (0 == i)
-      {
-        chunk = data.extract(0, chunkSize + remainder);
-      }
-      else
-      {
-        chunk = data.extract(i * chunkSize + remainder, chunkSize);
-      }
-      chunkedData.push_back(chunk);
-    }
-    return chunkedData;
-  }
 } // namespace kyc
