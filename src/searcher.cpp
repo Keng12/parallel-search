@@ -35,7 +35,7 @@ namespace kyc
     {
         std::shared_ptr<std::mutex> jobMutex = std::make_shared<std::mutex>();
         const int chunkSize = inputData->getSize() / mWorkerThreads;
-        const int remainder = inputData->getSize() - chunkSize * mWorkerThreads;
+        const int remainder = inputData->getSize() % mWorkerThreads;
 
         // Post jobs equal to number of working threads;
         for (int i = 0; i < mWorkerThreads; ++i)
