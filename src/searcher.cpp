@@ -11,10 +11,9 @@
 namespace kyc
 {
     Searcher::Searcher(kyc::vector<kyc::vector<std::string>> &inputVector, const int totalSize, const int nThreads)
-        : mData{inputVector}, mTotalSize{totalSize}, mWorkerThreads{nThreads}
+        : mData{inputVector}, mTotalSize{totalSize}, mThreadpool{nThreads}, mWorkerThreads{nThreads}
     {
         assert(nThreads > 0);
-        mThreadpool.start(nThreads);
     };
 
     std::shared_ptr<kyc::vector<std::string>> Searcher::search(const std::string &userInput)

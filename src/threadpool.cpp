@@ -18,6 +18,11 @@ namespace kyc
 
   Threadpool::Threadpool() {}
 
+  Threadpool::Threadpool(int const nWorkerThreads)
+  {
+    start(nWorkerThreads);
+  }
+
   Threadpool::~Threadpool()
   {
     stop();
