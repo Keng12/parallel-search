@@ -40,10 +40,10 @@ namespace kyc
         {
             const auto job = [output_ptr, userInput, i, jobMutex, this]()
             {
-                kyc::vector<std::string> const tmpInput{mData.at(i)};
-                const int size = tmpInput.getSize();
-                kyc::vector<std::string> tmpData{};
-                tmpData.reserve(size);
+                kyc::vector<std::string> const tmpData{mData.at(i)};
+                const int size = tmpData.getSize();
+                kyc::vector<std::string> tmpOutput{};
+                tmpOutput.reserve(size);
                 int index{};
 
                 do
@@ -54,7 +54,7 @@ namespace kyc
                         mTotalCounter += index;
                         {
                             std::lock_guard<std::mutex> const lock{*jobMutex};
-                            output_ptr->append(tmpData);
+                            output_ptr->append(tmpOutput);
                         }
                         if (mTotalSize == mTotalCounter)
                         {
@@ -62,10 +62,10 @@ namespace kyc
                         }
                         return;
                     }
-                    std::string element{tmpInput.at(index)};
+                    std::string element{tmpOutput.at(index)};
                     if (0 == element.rfind(userInput, 0))
                     {
-                        tmpData.push_back(std::move(element));
+                        tmpOutput.push_back(std::move(element));
                     }
                     ++index;
                 } while (true);
