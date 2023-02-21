@@ -62,7 +62,7 @@ namespace kyc
     return data;
   }
 
-  std::tuple<std::string, int> getFilename(std::string const &dir,
+  std::pair<std::string, int> getFilename(std::string const &dir,
                                            std::string const &basename)
   {
     std::string filename{};
@@ -80,7 +80,7 @@ namespace kyc
         break;
       }
     }
-    return {filename, counter};
+    return std::pair<std::string, int>{filename, counter};
   }
 
   int parseInput(const int argc, char **argv)

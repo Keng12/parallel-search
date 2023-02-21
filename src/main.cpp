@@ -17,7 +17,9 @@ int main(int argc, char *argv[])
         const int nThreads = kyc::parseInput(argc, argv);
         std::string const basename{"output"};
         std::string const dir{"results"};
-        auto [filename, counter] = kyc::getFilename(dir, basename);
+        std::pair<std::string, int> filedata =kyc::getFilename(dir, basename);
+        std::string filename = filedata.first;
+        int counter = filedata.second;
         kyc::vector<std::string> data = kyc::setupData("input.txt");
         std::cout << "Data: " << data.getSize() << std::endl;
         kyc::vector<kyc::vector<std::string>> chunkedData = kyc::splitData(data, nThreads);
