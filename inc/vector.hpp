@@ -22,10 +22,9 @@ namespace kyc
       return mArray.get();
     }
 
-    vector(T *input_ptr, int size) : mSize{std::move(size)}, mCapacity{mSize}, mCapacityFactor{2}
+    vector(T *input_ptr, int size) : mSize{std::move(size)}, mCapacity{mSize}, mCapacityFactor{2}, mArray{std::move(input_ptr)}
     {
       assert(size > 0);
-      mArray.reset(input_ptr);
     }
 
     std::unique_ptr<T[]> moveUniquePtr()
