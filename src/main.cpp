@@ -16,8 +16,7 @@ int main(int argc, char *argv[])
     {
         const int nThreads = kyc::parseInput(argc, argv);
         std::string const basename{"output"};
-        std::string const dir{"results"};
-        std::pair<std::string, int> filedata =kyc::getFilename(dir, basename);
+        std::pair<std::string, int> filedata =kyc::getFilename(basename);
         std::string filename = filedata.first;
         int counter = filedata.second;
         kyc::vector<std::string> data = kyc::setupData("input.txt");
@@ -47,7 +46,7 @@ int main(int argc, char *argv[])
                 std::ofstream out{filename};
                 out << ss.str();
                 ++counter;
-                filename = dir + "/" + basename + std::to_string(counter) + ".txt";
+                filename = basename + std::to_string(counter) + ".txt";
                 std::cout << "Wrote search results of " << input << " in: " << filename << std::endl;
             }
             else

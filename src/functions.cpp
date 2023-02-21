@@ -62,14 +62,13 @@ namespace kyc
     return data;
   }
 
-  std::pair<std::string, int> getFilename(std::string const &dir,
-                                           std::string const &basename)
+  std::pair<std::string, int> getFilename(std::string const &basename)
   {
     std::string filename{};
     int counter{};
     while (true)
     {
-      filename = std::string{dir + "/" + basename + std::to_string(counter) +
+      filename = std::string{basename + std::to_string(counter) +
                                  ".txt"};
       if (fileExists(filename))
       {
