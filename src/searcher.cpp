@@ -21,7 +21,7 @@ namespace kyc
         mTotalCounter = 0;
         mTotalSize = inputData->getSize();
         std::shared_ptr<kyc::vector<std::string>> output = std::make_shared<kyc::vector<std::string>>();
-        searchJob(inputData, userInput, output);
+        postSearchJob(inputData, userInput, output);
         {
             std::unique_lock<std::mutex> lock{mMutex};
             mCV.wait(lock, [this]
@@ -31,7 +31,7 @@ namespace kyc
         return output;
     }
 
-    void Searcher::searchJob(std::shared_ptr<kyc::vector<std::string>> inputData, const std::string &userInput, std::shared_ptr<kyc::vector<std::string>> output_ptr)
+    void Searcher::postSearchJob(std::shared_ptr<kyc::vector<std::string>> inputData, const std::string &userInput, std::shared_ptr<kyc::vector<std::string>> output_ptr)
     {
         std::shared_ptr<std::mutex> jobMutex = std::make_shared<std::mutex>();
         const int chunkSize = inputData->getSize() / mWorkerThreads;
