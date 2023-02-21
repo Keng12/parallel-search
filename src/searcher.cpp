@@ -23,9 +23,7 @@ namespace kyc
     std::shared_ptr<kyc::vector<std::string>> Searcher::search(const std::string &userInput)
     {
         mSearchFinished = false;
-        // Post jobs equal to number of working threads;
         mTotalCounter = 0;
-        std::cout << "Total Size: " << mTotalSize << std::endl;
         std::shared_ptr<kyc::vector<std::string>> output = std::make_shared<kyc::vector<std::string>>();
         searchJob(userInput, output);
         {
@@ -33,14 +31,14 @@ namespace kyc
             mCV.wait(lock, [this]
                      { return mSearchFinished; });
         }
-        std::cout << "Finish job" << std::endl;
-
+        std::cout << "Finished search" << std::endl;
         return output;
     }
 
     void Searcher::searchJob(const std::string &userInput, std::shared_ptr<kyc::vector<std::string>> output_ptr)
     {
         std::shared_ptr<std::mutex> jobMutex = std::make_shared<std::mutex>();
+        // Post jobs equal to number of working threads;
         for (int i = 0; i < mWorkerThreads; ++i)
         {
             const auto job = [output_ptr, userInput, i, jobMutex, this]()
@@ -50,20 +48,17 @@ namespace kyc
                 kyc::vector<std::string> tmpData{};
                 tmpData.reserve(size);
                 int index{};
-                
+
                 do
                 {
                     if (size == index) // Counter has been reached
                     {
                         
-                        std::cout << "Final element " << index << std::endl;
                         mTotalCounter += index;
-                        std::cout << "Total counter: " << mTotalCounter << std::endl;
                         {
                             std::lock_guard<std::mutex> const lock{*jobMutex};
                             output_ptr->append(tmpData);
                         }
-                        std::cout << "After mutex" << std::endl;
                         if (mTotalSize == mTotalCounter)
                         {
                             notifyMainThread();
@@ -76,7 +71,6 @@ namespace kyc
                         tmpData.push_back(std::move(element));
                     }
                     ++index;
-        //std::cout << index << "\n";
                 } while (true);
             };
             mThreadpool.postJob(job);
