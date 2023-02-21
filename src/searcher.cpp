@@ -10,14 +10,11 @@
 // No: Pop and continue
 namespace kyc
 {
-    Searcher::Searcher(kyc::vector<kyc::vector<std::string>> &inputVector, const int totalSize)
-        : mData{inputVector}, mTotalSize{totalSize} {};
-
-    void Searcher::start(int n)
+    Searcher::Searcher(kyc::vector<kyc::vector<std::string>> &inputVector, const int totalSize, const int nThreads)
+        : mData{inputVector}, mTotalSize{totalSize}, mWorkerThreads{nThreads}
     {
-        assert(n > 0);
-        mThreadpool.start(n);
-        mWorkerThreads = mThreadpool.getNumberThreads();
+        assert(nThreads > 0);
+        mThreadpool.start(nThreads);
     };
 
     std::shared_ptr<kyc::vector<std::string>> Searcher::search(const std::string &userInput)
@@ -53,7 +50,7 @@ namespace kyc
                 {
                     if (size == index) // Counter has been reached
                     {
-                        
+
                         mTotalCounter += index;
                         {
                             std::lock_guard<std::mutex> const lock{*jobMutex};

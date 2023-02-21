@@ -25,9 +25,7 @@ namespace kyc
     const int mTotalSize{};
 
   public:
-    Searcher(kyc::vector<kyc::vector<std::string>> &inputVector, const int totalSize);
-
-    void start(int n);
+    Searcher(kyc::vector<kyc::vector<std::string>> &inputVector, const int totalSize, const int nThreads);
     void searchJob(const std::string &userInput, std::shared_ptr<kyc::vector<std::string>> output_ptr);
     std::shared_ptr<kyc::vector<std::string>> search(const std::string &userInput);
     void stop();

@@ -15,16 +15,27 @@
 
 namespace kyc
 {
-  void Threadpool::start(int nWorkerThreads)
+
+  Threadpool::Threadpool() {}
+
+  Threadpool::~Threadpool()
+  {
+    stop();
+  }
+  void Threadpool::start(int const nWorkerThreads)
   {
     assert(nWorkerThreads > 0);
-    mWorkerThreads = nWorkerThreads;
-    std::cout << "Threadpool: No. of threads: " << mWorkerThreads << std::endl;
-    mThreads.reserve(mWorkerThreads);
-    mJobQueue.reserve(mWorkerThreads);
-    for (int i = 0; i < mWorkerThreads; ++i)
+    if (!mStarted)
     {
-      mThreads.emplace_back(&Threadpool::threadLoop, this);
+      mWorkerThreads = nWorkerThreads;
+      std::cout << "Threadpool: No. of threads: " << mWorkerThreads << std::endl;
+      mThreads.reserve(mWorkerThreads);
+      mJobQueue.reserve(mWorkerThreads);
+      for (int i = 0; i < mWorkerThreads; ++i)
+      {
+        mThreads.emplace_back(&Threadpool::threadLoop, this);
+      }
+      mStarted = true;
     }
   }
 
@@ -59,16 +70,21 @@ namespace kyc
 
   void Threadpool::stop()
   {
+    if (mStarted)
     {
-      std::lock_guard<std::mutex> const lock(mMutex);
-      mShutdown = true;
+      {
+        std::lock_guard<std::mutex> const lock(mMutex);
+        mShutdown = true;
+      }
+      mCondVar.notify_all();
+      for (std::thread &thread : mThreads)
+      {
+        thread.join();
+      }
     }
-    mCondVar.notify_all();
-    for (std::thread &thread : mThreads)
-    {
-      thread.join();
-    }
+    mThreads.clear();
+    mJobQueue.clear();
+    mStarted = false;
   }
-
   int Threadpool::getNumberThreads() const { return mWorkerThreads; }
 }; // namespace kyc

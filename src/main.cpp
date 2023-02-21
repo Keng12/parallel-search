@@ -23,8 +23,7 @@ int main(int argc, char *argv[])
         std::cout << "Data: " << data.getSize() << std::endl;
         kyc::vector<kyc::vector<std::string>> chunkedData = kyc::splitData(data, nThreads);
         std::cout << "Finish split data (main)" << std::endl;
-        kyc::Searcher searcher{chunkedData, data.getSize()};
-        searcher.start(nThreads);
+        kyc::Searcher searcher{chunkedData, data.getSize(), nThreads};
         while (true)
         {
             // During incremental search the input will be received via an event handler
@@ -55,7 +54,6 @@ int main(int argc, char *argv[])
                 break;
             }
         }
-        searcher.stop();
     }
     catch (std::exception const &e)
     {

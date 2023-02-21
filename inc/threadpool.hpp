@@ -22,9 +22,13 @@ class Threadpool {
   std::atomic_bool mShutdown{};
   std::condition_variable mCondVar{}; // Allows threads to wait on new jobs or termination
   int mWorkerThreads{};
+  bool mStarted{};
 
 public:
-  void start(int nWorkerThreads);
+  Threadpool();
+  Threadpool(int const nWorkerThreads);
+  ~Threadpool();
+  void start(int const nWorkerThreads);
   void threadLoop();
   void postJob(const std::function<void()> &job);
   void stop();
