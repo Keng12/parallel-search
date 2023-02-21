@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     {
         const int nThreads = kyc::parseInput(argc, argv);
         std::string const basename{"output"};
-        std::pair<std::string, int> filedata =kyc::getFilename(basename);
+        std::pair<std::string, int> filedata = kyc::getFilename(basename);
         std::string filename = filedata.first;
         int counter = filedata.second;
         kyc::vector<std::string> data = kyc::setupData("input.txt");
