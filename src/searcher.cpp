@@ -62,7 +62,7 @@ namespace kyc
                         }
                         return;
                     }
-                    std::string element{tmpOutput.at(index)};
+                    std::string element{tmpData.at(index)};
                     if (0 == element.rfind(userInput, 0))
                     {
                         tmpOutput.push_back(std::move(element));
