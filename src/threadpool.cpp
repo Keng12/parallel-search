@@ -15,12 +15,9 @@
 
 namespace kyc
 {
-
-  Threadpool::Threadpool() {}
-
-  Threadpool::Threadpool(int const nWorkerThreads)
+  Threadpool::Threadpool(int nWorkerThreads) : mWorkerThreads{std::move(nWorkerThreads)}
   {
-    start(nWorkerThreads);
+    start(mWorkerThreads);
   }
 
   Threadpool::~Threadpool()
@@ -32,7 +29,6 @@ namespace kyc
     assert(nWorkerThreads > 0);
     if (!mStarted)
     {
-      mWorkerThreads = nWorkerThreads;
       std::cout << "Threadpool: No. of threads: " << mWorkerThreads << std::endl;
       mThreads.reserve(mWorkerThreads);
       mJobQueue.reserve(mWorkerThreads);

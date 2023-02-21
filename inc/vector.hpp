@@ -12,17 +12,17 @@ namespace kyc
   template <class T>
   class vector
   {
-    int mSize{};
-    int mCapacity{};
-    const int mCapacityFactor{};
-    std::unique_ptr<T[]> mArray{};
+    int mSize;
+    int mCapacity;
+    const int mCapacityFactor;
+    std::unique_ptr<T[]> mArray;
 
     T *get() const
     {
       return mArray.get();
     }
 
-    vector(T *input_ptr, const int size) : mSize{size}, mCapacity{size}, mCapacityFactor{2}
+    vector(T *input_ptr, int size) : mSize{std::move(size)}, mCapacity{mSize}, mCapacityFactor{2}
     {
       assert(size > 0);
       mArray.reset(input_ptr);

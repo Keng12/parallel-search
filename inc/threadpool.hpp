@@ -18,17 +18,17 @@ namespace kyc
 {
   class Threadpool
   {
+    int mWorkerThreads;
     std::mutex mMutex{};
     std::vector<std::thread> mThreads{};
     std::vector<std::function<void()>> mJobQueue{};
     std::atomic_bool mShutdown{};
     std::condition_variable mCondVar{}; // Allows threads to wait on new jobs or termination
-    int mWorkerThreads{};
     bool mStarted{};
 
   public:
     Threadpool();
-    Threadpool(int const nWorkerThreads);
+    Threadpool(int nWorkerThreads);
     ~Threadpool();
     void start(int const nWorkerThreads);
     void threadLoop();

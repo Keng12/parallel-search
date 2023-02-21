@@ -10,16 +10,15 @@
 // No: Pop and continue
 namespace kyc
 {
-    Searcher::Searcher(const int nThreads) : mThreadpool{nThreads}, mWorkerThreads{nThreads}
+    Searcher::Searcher(int nThreads) : mWorkerThreads{std::move(nThreads)}, mThreadpool{mWorkerThreads}
     {
-        assert(nThreads > 0);
+        assert(mWorkerThreads > 0);
     };
 
     std::shared_ptr<kyc::vector<std::string>> Searcher::search(std::shared_ptr<kyc::vector<std::string>> inputData, const std::string &userInput)
     {
         mSearchFinished = false;
         mTotalCounter = 0;
-        mTotalSize = inputData->getSize();
         std::shared_ptr<kyc::vector<std::string>> output = std::make_shared<kyc::vector<std::string>>();
         postSearchJob(inputData, userInput, output);
         {
@@ -34,13 +33,13 @@ namespace kyc
     void Searcher::postSearchJob(std::shared_ptr<kyc::vector<std::string>> inputData, const std::string &userInput, std::shared_ptr<kyc::vector<std::string>> output_ptr)
     {
         std::shared_ptr<std::mutex> jobMutex = std::make_shared<std::mutex>();
-        const int chunkSize = inputData->getSize() / mWorkerThreads;
-        const int remainder = inputData->getSize() % mWorkerThreads;
-
+        const int totalSize = inputData->getSize();
+        const int chunkSize = totalSize / mWorkerThreads;
+        const int remainder = totalSize % mWorkerThreads;
         // Post jobs equal to number of working threads;
         for (int i = 0; i < mWorkerThreads; ++i)
         {
-            const auto job = [inputData, output_ptr, userInput, i, jobMutex, chunkSize, remainder, this]()
+            const auto job = [inputData, output_ptr, userInput, i, jobMutex, chunkSize, remainder, totalSize, this]()
             {
                 kyc::vector<std::string> tmpData{};
                 if (0 == i)
@@ -64,7 +63,7 @@ namespace kyc
                             std::lock_guard<std::mutex> const lock{*jobMutex};
                             output_ptr->append(tmpOutput);
                         }
-                        if (mTotalSize == mTotalCounter)
+                        if (totalSize == mTotalCounter)
                         {
                             notifyMainThread();
                         }
