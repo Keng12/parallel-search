@@ -10,12 +10,17 @@
 
 namespace kyc
 {
+  bool fileExists(const std::string &filename)
+  {
+    std::ifstream f{filename};
+    return f.good();
+  }
+
   kyc::vector<std::string> setupData(std::string const &filename)
   {
-    std::filesystem::path file{filename};
     kyc::vector<std::string> data{};
     data.reserve(std::pow(26, 4));
-    if (!std::filesystem::exists(file))
+    if (!fileExists(filename))
     {
       std::cout << "Create input data" << std::endl;
       std::array<char, 26> alphabet{'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
@@ -61,19 +66,17 @@ namespace kyc
                                            std::string const &basename)
   {
     std::string filename{};
-    std::filesystem::create_directory(std::filesystem::path{dir});
     int counter{};
     while (true)
     {
-      std::filesystem::path file{dir + "/" + basename + std::to_string(counter) +
+      filename = std::string{dir + "/" + basename + std::to_string(counter) +
                                  ".txt"};
-      if (std::filesystem::exists(file))
+      if (fileExists(filename))
       {
         ++counter;
       }
       else
       {
-        filename = file.string();
         break;
       }
     }
@@ -140,7 +143,7 @@ namespace kyc
       {
         chunk = data.extract(i * chunkSize + remainder, chunkSize);
       }
-      std::cout << "Chunk size: " << chunk.getSize() <<std::endl;
+      std::cout << "Chunk size: " << chunk.getSize() << std::endl;
       chunkedData.push_back(chunk);
     }
     std::cout << "No of chunks: " << chunkedData.getSize() << std::endl;
