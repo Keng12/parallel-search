@@ -28,8 +28,8 @@ namespace kyc
     Searcher(kyc::vector<kyc::vector<std::string>> &inputVector, const int totalSize);
 
     void start(int n);
-    void searchJob(const std::string &userInput, kyc::vector<std::shared_ptr<kyc::vector<std::string>>> &output_ptr);
-    kyc::vector<std::string> search(const std::string &userInput);
+    void searchJob(const std::string &userInput, std::shared_ptr<kyc::vector<std::string>> output_ptr);
+    std::shared_ptr<kyc::vector<std::string>> search(const std::string &userInput);
     void stop();
     void notifyMainThread();
   };

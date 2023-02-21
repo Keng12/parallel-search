@@ -67,7 +67,8 @@ namespace kyc
       T *newArray = new T[n];
       std::copy_n(mArray.get(), mSize, newArray);
       mArray.reset(newArray);
-      mCapacity = n;    }
+      mCapacity = n;
+    }
 
     int getSize() const
     {
@@ -94,15 +95,17 @@ namespace kyc
       return output;
     }
 
-    // Pass by value -> appendage has to be copied, otherwise can be changed externally
-    void append(vector appendage)
+    void append(vector const& appendage)
     {
-      T *newArray = new T[mSize + appendage.getSize()];
-      std::copy_n(mArray.get(), mSize, newArray);
-      std::copy_n(appendage.get(), appendage.getSize(), newArray + mSize);
-      mArray.reset(newArray);
-      mSize += appendage.getSize();
-      mCapacity = mSize;
+      if (appendage.getSize() > 0)
+      {
+        T *newArray = new T[mSize + appendage.getSize()];
+        std::copy_n(mArray.get(), mSize, newArray);
+        std::copy_n(appendage.get(), appendage.getSize(), newArray + mSize);
+        mArray.reset(newArray);
+        mSize += appendage.getSize();
+        mCapacity = mSize;
+      }
     }
   };
 } // namespace kyc

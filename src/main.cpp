@@ -35,13 +35,13 @@ int main(int argc, char *argv[])
             {
                 std::cout << "Searching for: " << input << std::endl;
                 auto const startTime = std::chrono::steady_clock::now();
-                kyc::vector<std::string> results = searcher.search(input);
+                std::shared_ptr<kyc::vector<std::string>> const results = searcher.search(input);
                 const std::chrono::duration<double> elapsedTime = std::chrono::steady_clock::now() - startTime;
-                std::cout << "Search time: " << elapsedTime.count() << " seconds. Count: " << results.getSize() << std::endl;
+                std::cout << "Search time: " << elapsedTime.count() << " seconds. Count: " << results->getSize() << std::endl;
                 std::stringstream ss{};
-                for (int i = 0; i < results.getSize(); ++i)
+                for (int i = 0; i < results->getSize(); ++i)
                 {
-                    ss << results.at(i) << "\n";
+                    ss << results->at(i) << "\n";
                 }
                 std::ofstream out{filename};
                 out << ss.str();
