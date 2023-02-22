@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
         {
             std::shared_ptr<kyc::vector<std::string>> results = searcher.search(data);
             if (searcher.getLastInput() == '0')
-            {   
+            {
                 std::cout << "Exiting program" << std::endl;
                 break;
             }
@@ -39,11 +39,11 @@ int main(int argc, char *argv[])
                 }
                 std::ofstream out{filename};
                 out << ss.str();
+                std::cout << "Save results to: " << filename << "\n_____________________________________________________" << std::endl;
                 ++counter;
                 filename = basename + std::to_string(counter) + ".txt";
                 // Increment search -> look for subset of input data -> swap input data with output data
                 data.swap(results);
-                std::cout << "Save results to: " << filename << "\n_____________________________________________________" << std::endl;
             }
         }
     }
