@@ -55,13 +55,13 @@ namespace kyc
                 std::cout << "Search completed" << std::endl;
             }
         }
-        else if (mUserInput.length() >= 5)
-        {
-            std::cout << "More than four characters were received (" << mUserInput << "). Exiting program." << std::endl;
-        }
         else if (!mUserInput.empty() && mUserInput.back() == '0')
         {
             std::cout << "'0' entered. Exiting program'" << std::endl;
+        }
+        else if (mUserInput.length() >= 5)
+        {
+            std::cout << "More than four characters were received (" << mUserInput << "). Exiting program." << std::endl;
         }
         else if (mUserInput.empty())
         {
