@@ -22,20 +22,24 @@ namespace kyc
         {
             mSearchFinished = false;
             postSearchJob(inputData, userInput, output);
+            bool canceled{};
             {
                 std::unique_lock<std::shared_timed_mutex> lock{mMutex};
                 // Wait for input or until search is finished
                 mCV.wait(lock, [this]
                          { return mSearchFinished || mSearchCanceled; });
-            }
-            if (mSearchCanceled)
-            {
-                // Search was canceled -> keep input data without modification
-                output.swap(inputData);
+
+                if (mSearchCanceled)
                 {
-                    std::unique_lock<std::shared_timed_mutex> lock{mMutex};
+                    // Search was canceled -> keep input data without modification
+                    canceled = true;
                     mSearchCanceled = false;
+                    mSearchFinished = true;
                 }
+            }
+            if (canceled) // Outside unique_lock
+            {
+                output.swap(inputData);
             }
         }
         std::cout << "Finished search" << std::endl;
