@@ -20,17 +20,14 @@ namespace kyc
     {
         while (true)
         {
-            //char const input = getKeyboardInput();
+            // char const input = getKeyboardInput();
             std::string input{};
             std::cin >> input;
             std::cout << "Received character: " << input << std::endl;
             {
                 std::lock_guard<std::shared_timed_mutex> const lock{mMutex};
                 mBufferedInput.append(input);
-                if (!mSearchCanceled)
-                {
-                    mSearchCanceled = true;
-                }
+                mSearchCanceled = true;
             }
             mCV.notify_one();
             if (input == "0" || mBufferedInput.length() >= 5)
