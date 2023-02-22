@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
             {
                 std::cout << "Searching for: " << input << std::endl;
                 auto const startTime = std::chrono::steady_clock::now();
-                std::shared_ptr<kyc::vector<std::string>> const results = searcher.search(data, input);
+                std::shared_ptr<kyc::vector<std::string>> results = searcher.search(data, input);
                 const std::chrono::duration<double> elapsedTime = std::chrono::steady_clock::now() - startTime;
                 std::cout << "Search time: " << elapsedTime.count() << " seconds. Count: " << results->getSize() << std::endl;
                 std::stringstream ss{};
@@ -44,6 +44,8 @@ int main(int argc, char *argv[])
                 std::cout << "Wrote search results of " << input << " in: " << filename << std::endl;
                 ++counter;
                 filename = basename + std::to_string(counter) + ".txt";
+                // Increment search -> look for substring
+                data.swap(results);
             }
             else
             {
