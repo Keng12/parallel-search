@@ -32,7 +32,7 @@ namespace kyc
     void postSearchJob(std::shared_ptr<kyc::vector<std::string>> inputData, std::shared_ptr<kyc::vector<std::string>> output_ptr);
     std::shared_ptr<kyc::vector<std::string>> search(std::shared_ptr<kyc::vector<std::string>> inputData);
     void notifyMainThread();
-    char getLastInput() const;
+    std::string getInputString() const;
   };
 } // namespace kyc
 #endif

@@ -174,9 +174,9 @@ namespace kyc
         return tmpBool;
     }
 
-    char Searcher::getLastInput() const
+    std::string Searcher::getInputString() const
     {
-        return mUserInput.back();
+        return mUserInput;
     }
 
 }; // namespace kyc

@@ -34,7 +34,7 @@ namespace kyc
                 }
             }
             mCV.notify_one();
-            if (input == '0')
+            if (input == '0' || mBufferedInput.length() == 5)
             {
                 return;
             }
