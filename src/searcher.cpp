@@ -32,8 +32,8 @@ namespace kyc
         {
             std::cout << "Enter search string:" << std::endl;
             std::cin >> mUserInput;
-            std::cout << "Searching for: " << mUserInput << std::endl;
         }
+        std::cout << "Searching for: " << mUserInput << std::endl;
         std::shared_ptr<kyc::vector<std::string>> output = std::make_shared<kyc::vector<std::string>>();
         mSearchFinished = false;
         std::cout << "Input data size: " << inputData->getSize() << std::endl;
