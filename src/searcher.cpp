@@ -18,19 +18,21 @@ namespace kyc
     std::shared_ptr<kyc::vector<std::string>> Searcher::search(std::shared_ptr<kyc::vector<std::string>> inputData, const std::string &userInput)
     {
         std::shared_ptr<kyc::vector<std::string>> output = std::make_shared<kyc::vector<std::string>>();
+        // Wait input event
+                        std::cout << "Input data size: " << inputData->getSize() << std::endl;
         if (inputData->getSize() > 0)
         {
             postSearchJob(inputData, userInput, output);
             bool canceled{};
             {
                 std::unique_lock<std::shared_timed_mutex> lock{mMutex};
-                // Wait for input or until search is finished
+                // Wait for input event or until search is finished
                 mCV.wait(lock, [this]
                          { return mSearchFinished || mSearchCanceled; });
                 mSearchFinished = true; // In case search got canceled -> Do not update output data
                 canceled = mSearchCanceled;
             }
-            if (canceled) // Outside unique_lock
+            if (canceled) // Outside unique_lock, not modified anymore after setting mSearchFinished
             {
                 output.swap(inputData);
             }
@@ -56,10 +58,13 @@ namespace kyc
             nJobs = mWorkerThreads;
         }
         // Post jobs equal to number of working threads;
+        //Get input,
+        // If search not cancelled -> cancel search, notify main thread
         {
             std::unique_lock<std::shared_timed_mutex> lock{mMutex};
-            mSearchCanceled = false;
+            mSearchCanceled  = false;
         }
+        mSearchFinished = false;
         for (int i = 0; i < nJobs; ++i)
         {
             const auto job = [inputData, output_ptr, userInput, i, jobMutex, chunkSize, remainder, totalSize, totalCounter, this]()
