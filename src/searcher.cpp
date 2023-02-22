@@ -25,7 +25,7 @@ namespace kyc
             {
                 mCV.wait(lock);
             }
-            mUserInput = bufferdInput;
+            mUserInput = mEventHandlerThread.getBufferedString();
             mSearchCanceled = false;
         }
         else
