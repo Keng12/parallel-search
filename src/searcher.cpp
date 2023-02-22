@@ -26,6 +26,7 @@ namespace kyc
             - eventHandler.bufferedString -> Buffered string to search
             - Construct input string by appending incoming characters to buffered string
             - Event handler: if (!mSearchCanceled) {mSearchCanceled = true; notify main thread}
+            - Shares mSearchCanceled, mMutex and mCV
             if (eventHandler.bufferedString == mUserInput){
                 waitForNewEvent(); //
             }
