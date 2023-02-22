@@ -16,14 +16,16 @@ namespace kyc
   class Searcher
   {
     int const mWorkerThreads;
+    bool const &mSearchCanceled;
     kyc::Threadpool mThreadpool;
     std::condition_variable mCV{};
     std::mutex mMutex{};
     bool mSearchFinished{};
     std::atomic<int> mTotalCounter{};
+    bool getSearchCanceled();
 
   public:
-    Searcher(const int nThreads);
+    Searcher(const int nThreads, bool const &searchCanceled);
     void postSearchJob(std::shared_ptr<kyc::vector<std::string>> inputData, const std::string &userInput, std::shared_ptr<kyc::vector<std::string>> output_ptr);
     std::shared_ptr<kyc::vector<std::string>> search(std::shared_ptr<kyc::vector<std::string>> inputData, const std::string &userInput);
     void stop();

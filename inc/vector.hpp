@@ -87,14 +87,22 @@ namespace kyc
 
     vector extract(const int src_begin_index, const int elements_to_copy) const
     {
-      assert(elements_to_copy > 0 && elements_to_copy <= mSize && src_begin_index >= 0 && src_begin_index < mSize);
-      T *newArray = new T[elements_to_copy];
-      std::copy_n(mArray.get() + src_begin_index, elements_to_copy, newArray);
-      vector output{newArray, elements_to_copy};
+      assert(elements_to_copy >= 0 && elements_to_copy <= mSize && src_begin_index >= 0 && src_begin_index < mSize);
+      vector output{};
+      if (elements_to_copy > 0)
+      {
+        T *newArray = new T[elements_to_copy];
+        std::copy_n(mArray.get() + src_begin_index, elements_to_copy, newArray);
+        output = vector{newArray, elements_to_copy};
+      }
+      else
+      {
+        std::cerr << "Warning: elements_to_copy == 0" << std::endl;
+      }
       return output;
     }
 
-    void append(vector const& appendage)
+    void append(vector const &appendage)
     {
       if (appendage.getSize() > 0)
       {

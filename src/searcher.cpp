@@ -10,7 +10,7 @@
 // No: Pop and continue
 namespace kyc
 {
-    Searcher::Searcher(int nThreads) : mWorkerThreads{std::move(nThreads)}, mThreadpool{mWorkerThreads}
+    Searcher::Searcher(int nThreads, bool const &searchCanceled) : mWorkerThreads{std::move(nThreads)}, mThreadpool{mWorkerThreads}, mSearchCanceled{searchCanceled}
     {
         assert(mWorkerThreads > 0);
     };
@@ -24,7 +24,7 @@ namespace kyc
         {
             std::unique_lock<std::mutex> lock{mMutex};
             mCV.wait(lock, [this]
-                     { return mSearchFinished; });
+                     { return mSearchFinished || mSearchCanceled; });
         }
         std::cout << "Finished search" << std::endl;
         return output;
@@ -37,10 +37,12 @@ namespace kyc
         const int chunkSize = totalSize / mWorkerThreads;
         const int remainder = totalSize % mWorkerThreads;
         int nJobs{};
-        if (chunkSize == 0){
+        if (chunkSize == 0)
+        {
             nJobs = remainder;
         }
-        else {
+        else
+        {
             nJobs = mWorkerThreads;
         }
         // Post jobs equal to number of working threads;
@@ -61,7 +63,7 @@ namespace kyc
                 kyc::vector<std::string> tmpOutput{};
                 tmpOutput.reserve(size);
                 int index{};
-                do
+                while (!getSearchCanceled())
                 {
                     if (size == index) // Counter has been reached
                     {
@@ -83,7 +85,7 @@ namespace kyc
                         tmpOutput.push_back(element);
                     }
                     ++index;
-                } while (true);
+                }
             };
             mThreadpool.postJob(job);
         }
@@ -98,5 +100,14 @@ namespace kyc
         }
         mCV.notify_one();
         return;
+    }
+    bool Searcher::getSearchCanceled()
+    {
+        bool tmpBool{};
+        {
+            std::lock_guard<std::mutex> const lock{mMutex};
+            tmpBool = mSearchCanceled;
+        }
+        return tmpBool;
     }
 }; // namespace kyc
