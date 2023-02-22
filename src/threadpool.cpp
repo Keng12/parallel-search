@@ -80,7 +80,10 @@ namespace kyc
       mCondVar.notify_all();
       for (std::thread &thread : mThreads)
       {
-        thread.join();
+        if (thread.joinable())
+        {
+          thread.join();
+        }
       }
       mThreads.clear();
       mJobQueue.clear();
