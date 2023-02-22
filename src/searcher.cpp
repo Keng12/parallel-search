@@ -106,40 +106,28 @@ namespace kyc
                 kyc::vector<std::string> tmpOutput{};
                 tmpOutput.reserve(size);
                 int index{};
+                std::cout << "Entering while-loop: " << i << std::endl;
                 while (!getSearchCanceled())
                 {
                     if (size == index) // Counter has been reached
                     {
-                        if (!getSearchCanceled())
+                        // Increment and check total counter or return if canceled
+                        int tmpCounter{};
                         {
-                            // Increment and check total counter or return if canceled
-                            int tmpCounter{};
-                            if (!getSearchCanceled())
-                            {
-                                std::lock_guard<std::mutex> const lock{*jobMutex};
-                                *totalCounter += index;
-                                tmpCounter = *totalCounter;
-                            }
-                            else
-                            {
-                                return;
-                            }
-                            // Append to output vector or return if canceled
-                            if (tmpOutput.getSize() > 0 && !getSearchCanceled())
-                            {
-                                std::lock_guard<std::mutex> const lock{*jobMutex};
-                                output_ptr->append(tmpOutput);
-                            }
-                            else
-                            {
-                                return;
-                            }
-                            // Notify main thread and finish or return if cancelled
-                            if (totalSize == tmpCounter && !getSearchCanceled())
-                            {
-                                notifyMainThread();
-                            }
-                            return;
+                            std::lock_guard<std::mutex> const lock{*jobMutex};
+                            *totalCounter += index;
+                            tmpCounter = *totalCounter;
+                        }
+                        // Append to output vector or return if canceled
+                        if (tmpOutput.getSize() > 0)
+                        {
+                            std::lock_guard<std::mutex> const lock{*jobMutex};
+                            output_ptr->append(tmpOutput);
+                        }
+                        // Notify main thread and finish or return if cancelled
+                        if (totalSize == tmpCounter)
+                        {
+                            notifyMainThread();
                         }
                         return;
                     }
