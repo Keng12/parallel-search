@@ -15,25 +15,34 @@ namespace kyc
         assert(mWorkerThreads > 0);
     };
 
-    std::shared_ptr<kyc::vector<std::string>> Searcher::search(std::shared_ptr<kyc::vector<std::string>> inputData, const std::string &userInput)
+    std::shared_ptr<kyc::vector<std::string>> Searcher::search(std::shared_ptr<kyc::vector<std::string>> inputData)
     {
         std::shared_ptr<kyc::vector<std::string>> output = std::make_shared<kyc::vector<std::string>>();
+        mUserInput.clear();
+        if (mEventHandler)
         {
             // Wait for input event to get user input
             // Event handler -> List of characters
             // Event handler -> construct input string by appending incoming characters
-            // Get input here, wait if no new input available 
+            // Get input here, wait if no new input available
             // Set boolean to false after retrieving input
-            // Keep current search string; compare and wait if equal to buffered string in event handler 
+            // Keep current search string; compare and wait if equal to buffered string in event handler
             std::lock_guard<std::shared_timed_mutex> lock{mMutex};
             mSearchCanceled = false;
             // In demo: Use user input provided by std::cin instead
+        }
+        else
+        {
+            std::cout << "Enter search string:" << std::endl;
+            std::cin >> mUserInput;
+            std::cout << "Searching for: " << mUserInput << std::endl;
         }
         mSearchFinished = false;
         std::cout << "Input data size: " << inputData->getSize() << std::endl;
         if (inputData->getSize() > 0)
         {
-            postSearchJob(inputData, userInput, output);
+            auto const startTime = std::chrono::steady_clock::now();
+            postSearchJob(inputData, output);
             bool canceled{};
             {
                 // Event handler: 1. Get input, 2. If search not cancelled -> cancel search, notify main thread
@@ -43,6 +52,8 @@ namespace kyc
                 mSearchFinished = true;                                   // In case search got canceled -> Do not update output data
                 canceled = mSearchCanceled;
             }
+            const std::chrono::duration<double> elapsedTime = std::chrono::steady_clock::now() - startTime;
+            std::cout << "Search time: " << elapsedTime.count() << " seconds. Count: " << output->getSize() << std::endl;
             if (canceled) // Outside unique_lock, output not modified anymore after setting mSearchFinished
             {
                 std::cout << "Search canceled" << std::endl;
@@ -60,7 +71,7 @@ namespace kyc
         return output;
     }
 
-    void Searcher::postSearchJob(std::shared_ptr<kyc::vector<std::string>> inputData, const std::string &userInput, std::shared_ptr<kyc::vector<std::string>> output_ptr)
+    void Searcher::postSearchJob(std::shared_ptr<kyc::vector<std::string>> inputData, std::shared_ptr<kyc::vector<std::string>> output_ptr)
     {
         std::shared_ptr<std::mutex> jobMutex = std::make_shared<std::mutex>();
         const int totalSize = inputData->getSize();
@@ -78,7 +89,7 @@ namespace kyc
         }
         for (int i = 0; i < nJobs; ++i)
         {
-            const auto job = [inputData, output_ptr, userInput, i, jobMutex, chunkSize, remainder, totalSize, totalCounter, this]()
+            const auto job = [inputData, output_ptr, i, jobMutex, chunkSize, remainder, totalSize, totalCounter, this]()
             {
                 kyc::vector<std::string> tmpData{};
                 if (0 == i)
@@ -115,7 +126,7 @@ namespace kyc
                         return;
                     }
                     std::string element{tmpData.at(index)};
-                    if (0 == element.rfind(userInput, 0))
+                    if (0 == element.rfind(mUserInput, 0))
                     {
                         tmpOutput.push_back(element);
                     }

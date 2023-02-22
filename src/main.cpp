@@ -25,36 +25,19 @@ int main(int argc, char *argv[])
         kyc::Searcher searcher{nThreads, searchCanceled};
         while (true)
         {
-            // During incremental search the input will be received via an event handler
-            std::string input{};
-            std::cout << "Enter search string:" << std::endl;
-            std::cin >> input;
-            if ("0" != input)
+            std::shared_ptr<kyc::vector<std::string>> results = searcher.search(data);
+            std::stringstream ss{};
+            for (int i = 0; i < results->getSize(); ++i)
             {
-                std::cout << "Searching for: " << input << std::endl;
-                auto const startTime = std::chrono::steady_clock::now();
-                std::shared_ptr<kyc::vector<std::string>> results = searcher.search(data, input);
-                const std::chrono::duration<double> elapsedTime = std::chrono::steady_clock::now() - startTime;
-                std::cout << "Search time: " << elapsedTime.count() << " seconds. Count: " << results->getSize() << std::endl;
-                std::stringstream ss{};
-                for (int i = 0; i < results->getSize(); ++i)
-                {
-                    ss << results->at(i) << "\n";
-                }
-                std::ofstream out{filename};
-                out << ss.str();
-                std::cout << "Wrote search results of " << input << " in: " << filename << std::endl;
-                ++counter;
-                filename = basename + std::to_string(counter) + ".txt";
-                // Increment search -> look for substring
-                data.swap(results);
-                std::cout << "_____________________________________________________" << std::endl;
+                ss << results->at(i) << "\n";
             }
-            else
-            {
-                std::cout << "Exiting" << std::endl;
-                break;
-            }
+            std::ofstream out{filename};
+            out << ss.str();
+            ++counter;
+            filename = basename + std::to_string(counter) + ".txt";
+            // Increment search -> look for substring
+            data.swap(results);
+            std::cout << "_____________________________________________________" << std::endl;
         }
     }
     catch (std::exception const &e)
