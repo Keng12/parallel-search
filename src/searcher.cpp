@@ -18,7 +18,6 @@ namespace kyc
     std::shared_ptr<kyc::vector<std::string>> Searcher::search(std::shared_ptr<kyc::vector<std::string>> inputData)
     {
         std::shared_ptr<kyc::vector<std::string>> output = std::make_shared<kyc::vector<std::string>>();
-        mUserInput.clear();
         if (mEventHandler)
         {
             std::unique_lock<std::shared_timed_mutex> lock{mMutex};
@@ -29,17 +28,6 @@ namespace kyc
             }
             mUserInput = bufferdInput;
             mSearchCanceled = false;
-            /*
-            - eventHandler.bufferedString -> Buffered string to search
-            - Construct input string by appending incoming characters to buffered string
-            - Event handler: if (!mSearchCanceled) {mSearchCanceled = true; notify main thread}
-            - Shares mSearchCanceled, mMutex and mCV
-            if (eventHandler.bufferedString == mUserInput){
-                waitForNewEvent(); //
-            }
-            mUserInput = eventHandler.bufferedString;
-            mSearchCanceled = false;
-            */
         }
         else
         {

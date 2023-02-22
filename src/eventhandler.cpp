@@ -1,5 +1,5 @@
 #include "eventhandler.hpp"
-
+#include <conio.h>
 namespace kyc
 {
     EventHandler::EventHandler(std::condition_variable_any &cv, std::shared_timed_mutex &mutex, bool &searchCanceled, bool &eventHandler) : mCV{cv}, mMutex{mutex}, mSearchCanceled{searchCanceled}, mEventHandler{eventHandler}
