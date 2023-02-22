@@ -113,23 +113,23 @@ namespace kyc
                         if (!getSearchCanceled())
                         {
                             // If event handler is used: return after each check
-                            // Append to output vector if necessary
                             if (tmpOutput.getSize() > 0 && !getSearchCanceled())
                             {
+                                // Append to output vector if necessary
                                 std::lock_guard<std::mutex> const lock{*jobMutex};
                                 output_ptr->append(tmpOutput);
                             }
-                            // Increment and check total counter or return if canceled
                             int tmpCounter{};
                             if (!getSearchCanceled())
                             {
+                                // Increment and check total counter or return if canceled
                                 std::lock_guard<std::mutex> const lock{*jobMutex};
                                 *totalCounter += index;
                                 tmpCounter = *totalCounter;
                             }
-                            // Notify main thread if search finished
                             if (totalSize == tmpCounter && !getSearchCanceled())
                             {
+                                // Notify main thread if search finished
                                 notifyMainThread();
                             }
                             return;
