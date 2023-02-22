@@ -106,34 +106,38 @@ namespace kyc
                 kyc::vector<std::string> tmpOutput{};
                 tmpOutput.reserve(size);
                 int index{};
-                std::cout << "Entering while-loop: " << i << std::endl;
                 while (!getSearchCanceled())
                 {
                     if (size == index)
-                    /*
-                        Counter has been reached
-                        With event handler: Check before each mutex lock if search has been canceled and return if true instead of working
-                    */
                     {
-                        // Append to output vector if necessary
-                        if (tmpOutput.getSize() > 0)
+                        if (!getSearchCanceled())
                         {
-                            std::lock_guard<std::mutex> const lock{*jobMutex};
-                            output_ptr->append(tmpOutput);
+                            // If event handler is used: return after each check
+                            // Append to output vector if necessary
+                            if (tmpOutput.getSize() > 0 && !getSearchCanceled())
+                            {
+                                std::lock_guard<std::mutex> const lock{*jobMutex};
+                                output_ptr->append(tmpOutput);
+                            }
+                            // Increment and check total counter or return if canceled
+                            int tmpCounter{};
+                            if (!getSearchCanceled())
+                            {
+                                std::lock_guard<std::mutex> const lock{*jobMutex};
+                                *totalCounter += index;
+                                tmpCounter = *totalCounter;
+                            }
+                            // Notify main thread if search finished
+                            if (totalSize == tmpCounter && !getSearchCanceled())
+                            {
+                                notifyMainThread();
+                            }
+                            return;
                         }
-                        // Increment and check total counter or return if canceled
-                        int tmpCounter{};
+                        else
                         {
-                            std::lock_guard<std::mutex> const lock{*jobMutex};
-                            *totalCounter += index;
-                            tmpCounter = *totalCounter;
+                            return;
                         }
-                        // Notify main thread if search finished
-                        if (totalSize == tmpCounter)
-                        {
-                            notifyMainThread();
-                        }
-                        return;
                     }
                     std::string element{tmpData.at(index)};
                     if (0 == element.rfind(mUserInput, 0))
