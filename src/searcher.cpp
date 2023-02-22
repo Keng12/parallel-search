@@ -48,7 +48,6 @@ namespace kyc
                 canceled = mSearchCanceled;
             }
             const std::chrono::duration<double> elapsedTime = std::chrono::steady_clock::now() - startTime;
-            std::cout << "Search time: " << elapsedTime.count() << " seconds. Count: " << output->getSize() << " out of " << inputData->getSize() << std::endl;
             if (canceled)
             {
                 std::cout << "Search canceled" << std::endl;
@@ -57,7 +56,7 @@ namespace kyc
             }
             else
             {
-                std::cout << "Search completed" << std::endl;
+                std::cout << "Search time: " << elapsedTime.count() << " seconds. Count: " << output->getSize() << " out of " << inputData->getSize() << std::endl;
             }
         }
         else if (!mUserInput.empty() && mUserInput.back() == '0')
@@ -113,6 +112,8 @@ namespace kyc
                 kyc::vector<std::string> tmpOutput{};
                 tmpOutput.reserve(size);
                 int index{};
+                using namespace std::chrono_literals;
+                std::this_thread::sleep_for(5s);
                 while (!getSearchCanceled())
                 {
                     if (size == index)
