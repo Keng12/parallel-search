@@ -112,6 +112,7 @@ namespace kyc
                     {
                         if (!getSearchCanceled())
                         {
+                            // Increment and check total counter or return if canceled
                             int tmpCounter{};
                             if (!getSearchCanceled())
                             {
@@ -123,6 +124,7 @@ namespace kyc
                             {
                                 return;
                             }
+                            // Append to output vector or return if canceled
                             if (tmpOutput.getSize() > 0 && !getSearchCanceled())
                             {
                                 std::lock_guard<std::mutex> const lock{*jobMutex};
@@ -132,14 +134,12 @@ namespace kyc
                             {
                                 return;
                             }
+                            // Notify main thread and finish or return if cancelled
                             if (totalSize == tmpCounter && !getSearchCanceled())
                             {
                                 notifyMainThread();
                             }
-                            else
-                            {
-                                return;
-                            }
+                            return;
                         }
                         return;
                     }
