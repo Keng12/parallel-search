@@ -21,6 +21,7 @@ namespace kyc
         while (true)
         {
             char input = getKeyboardInput();
+            std::cout << "Received character: " << input << std::endl;
             {
                 std::lock_guard<std::shared_timed_mutex> const lock{mMutex};
                 mBufferedInput.append(1, input);
