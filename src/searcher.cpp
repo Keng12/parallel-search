@@ -37,7 +37,7 @@ namespace kyc
         std::shared_ptr<kyc::vector<std::string>> output = std::make_shared<kyc::vector<std::string>>();
         mSearchFinished = false;
         std::cout << "Input data size: " << inputData->getSize() << std::endl;
-        if (inputData->getSize() > 0)
+        if (inputData->getSize() > 0 && !mUserInput.empty() && mUserInput.back() != '0')
         {
             auto const startTime = std::chrono::steady_clock::now();
             postSearchJob(inputData, output);
