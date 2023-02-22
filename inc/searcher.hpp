@@ -23,7 +23,7 @@ namespace kyc
     std::shared_timed_mutex mMutex{};
     bool mSearchFinished{};
     bool getSearchCanceled();
-
+    bool getSearchFinished();
   public:
     Searcher(const int nThreads, bool const &searchCanceled);
     void postSearchJob(std::shared_ptr<kyc::vector<std::string>> inputData, const std::string &userInput, std::shared_ptr<kyc::vector<std::string>> output_ptr);

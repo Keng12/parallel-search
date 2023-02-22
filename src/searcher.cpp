@@ -77,7 +77,7 @@ namespace kyc
                             *totalCounter += index;
                             tmpCounter = *totalCounter;
                         }
-                        if (tmpOutput.getSize() > 0)
+                        if (tmpOutput.getSize() > 0 && !getSearchFinished())
                         {
                             std::lock_guard<std::mutex> const lock{*jobMutex};
                             output_ptr->append(tmpOutput);
@@ -110,6 +110,17 @@ namespace kyc
         mCV.notify_one();
         return;
     }
+
+    bool Searcher::getSearchFinished()
+    {
+        bool tmpBool{};
+        {
+            std::shared_lock<std::shared_timed_mutex> const lock{mMutex};
+            tmpBool = mSearchFinished;
+        }
+        return tmpBool;
+    }
+
     bool Searcher::getSearchCanceled()
     {
         bool tmpBool{};
