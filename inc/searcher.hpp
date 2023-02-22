@@ -22,7 +22,6 @@ namespace kyc
     std::condition_variable_any mCV{};
     std::shared_timed_mutex mMutex{};
     bool mSearchFinished{};
-    bool getSearchCanceled();
     std::string mUserInput{};
     kyc::EventHandler mEventHandlerThread;
 
@@ -32,6 +31,7 @@ namespace kyc
     std::shared_ptr<kyc::vector<std::string>> search(std::shared_ptr<kyc::vector<std::string>> inputData);
     void notifyMainThread();
     std::string getInputString() const;
+    bool getSearchCanceled();
   };
 } // namespace kyc
 #endif
