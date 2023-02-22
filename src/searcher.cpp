@@ -61,7 +61,7 @@ namespace kyc
         //Get input,
         // If search not cancelled -> cancel search, notify main thread
         {
-            std::unique_lock<std::shared_timed_mutex> lock{mMutex};
+            std::lock_guard<std::shared_timed_mutex> lock{mMutex};
             mSearchCanceled  = false;
         }
         mSearchFinished = false;
