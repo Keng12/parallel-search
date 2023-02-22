@@ -5,6 +5,7 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <shared_mutex>
 
 #include "functions.hpp"
 #include "searcher.hpp"

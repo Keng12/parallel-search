@@ -4,6 +4,7 @@
 #include <cmath>
 #include <memory>
 #include <mutex>
+#include <shared_mutex>
 
 #include "threadpool.hpp"
 #include "vector.hpp"
@@ -18,8 +19,8 @@ namespace kyc
     int const mWorkerThreads;
     bool const &mSearchCanceled;
     kyc::Threadpool mThreadpool;
-    std::condition_variable mCV{};
-    std::mutex mMutex{};
+    std::condition_variable_any mCV{};
+    std::shared_timed_mutex mMutex{};
     bool mSearchFinished{};
     bool getSearchCanceled();
 
