@@ -17,7 +17,7 @@ namespace kyc
   class Searcher
   {
     int const mWorkerThreads;
-    bool const &mSearchCanceled;
+    bool &mSearchCanceled;
     kyc::Threadpool mThreadpool;
     std::condition_variable_any mCV{};
     std::shared_timed_mutex mMutex{};
@@ -25,7 +25,7 @@ namespace kyc
     bool getSearchCanceled();
     bool getSearchFinished();
   public:
-    Searcher(const int nThreads, bool const &searchCanceled);
+    Searcher(const int nThreads, bool &searchCanceled);
     void postSearchJob(std::shared_ptr<kyc::vector<std::string>> inputData, const std::string &userInput, std::shared_ptr<kyc::vector<std::string>> output_ptr);
     std::shared_ptr<kyc::vector<std::string>> search(std::shared_ptr<kyc::vector<std::string>> inputData, const std::string &userInput);
     void stop();

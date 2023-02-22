@@ -10,7 +10,7 @@
 // No: Pop and continue
 namespace kyc
 {
-    Searcher::Searcher(int nThreads, bool const &searchCanceled) : mWorkerThreads{std::move(nThreads)}, mThreadpool{mWorkerThreads}, mSearchCanceled{searchCanceled}
+    Searcher::Searcher(int nThreads, bool &searchCanceled) : mWorkerThreads{std::move(nThreads)}, mThreadpool{mWorkerThreads}, mSearchCanceled{searchCanceled}
     {
         assert(mWorkerThreads > 0);
     };
@@ -24,12 +24,18 @@ namespace kyc
             postSearchJob(inputData, userInput, output);
             {
                 std::unique_lock<std::shared_timed_mutex> lock{mMutex};
+                // Wait for input or until search is finished
                 mCV.wait(lock, [this]
                          { return mSearchFinished || mSearchCanceled; });
             }
-            if (mSearchCanceled){
+            if (mSearchCanceled)
+            {
                 // Search was canceled -> keep input data without modification
                 output.swap(inputData);
+                {
+                    std::unique_lock<std::shared_timed_mutex> lock{mMutex};
+                    mSearchCanceled = false;
+                }
             }
         }
         std::cout << "Finished search" << std::endl;
