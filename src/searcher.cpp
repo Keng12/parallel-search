@@ -27,6 +27,10 @@ namespace kyc
                 mCV.wait(lock, [this]
                          { return mSearchFinished || mSearchCanceled; });
             }
+            if (mSearchCanceled){
+                // Search was canceled -> keep input data without modification
+                output.swap(inputData);
+            }
         }
         std::cout << "Finished search" << std::endl;
         return output;
@@ -39,7 +43,6 @@ namespace kyc
         const int chunkSize = totalSize / mWorkerThreads;
         const int remainder = totalSize % mWorkerThreads;
         std::shared_ptr<int> totalCounter = std::make_shared<int>();
-
         int nJobs{};
         if (chunkSize == 0)
         {
