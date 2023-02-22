@@ -24,7 +24,6 @@ namespace kyc
     bool mSearchFinished{};
     bool getSearchCanceled();
     std::string mUserInput{};
-    bool const mEventHandler{};
     kyc::EventHandler mEventHandlerThread;
 
   public:

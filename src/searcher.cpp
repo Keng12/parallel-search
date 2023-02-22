@@ -10,14 +10,15 @@
 // No: Pop and continue
 namespace kyc
 {
-    Searcher::Searcher(int nThreads) : mWorkerThreads{std::move(nThreads)}, mThreadpool{mWorkerThreads}, mEventHandlerThread{mCV, mMutex, mSearchCanceled, mEventHandler}
+    Searcher::Searcher(int nThreads) : mWorkerThreads{std::move(nThreads)}, mThreadpool{mWorkerThreads}, mEventHandlerThread{mCV, mMutex, mSearchCanceled}
     {
         assert(mWorkerThreads > 0);
     };
 
     std::shared_ptr<kyc::vector<std::string>> Searcher::search(std::shared_ptr<kyc::vector<std::string>> inputData)
     {
-        if (mEventHandler)
+        std::shared_ptr<kyc::vector<std::string>> output = std::make_shared<kyc::vector<std::string>>();
+        mSearchFinished = false;
         {
             std::unique_lock<std::shared_timed_mutex> lock{mMutex};
             std::string const bufferedInput = mEventHandlerThread.getBufferedString();
@@ -29,14 +30,7 @@ namespace kyc
             mUserInput = mEventHandlerThread.getBufferedString();
             mSearchCanceled = false;
         }
-        else
-        {
-            std::cout << "Enter search string:" << std::endl;
-            std::cin >> mUserInput;
-        }
-        std::shared_ptr<kyc::vector<std::string>> output = std::make_shared<kyc::vector<std::string>>();
-        mSearchFinished = false;
-        if (inputData->getSize() > 0 && !mUserInput.empty() && mUserInput.back() != '0')
+        if (inputData->getSize() > 0 && !mUserInput.empty() && mUserInput.back() != '0' && mUserInput.length() < 5)
         {
             std::cout << "Searching for: " << mUserInput << std::endl;
             auto const startTime = std::chrono::steady_clock::now();
@@ -60,6 +54,10 @@ namespace kyc
             {
                 std::cout << "Search completed" << std::endl;
             }
+        }
+        else if (mUserInput.length() >= 5)
+        {
+            std::cout << "More than four characters were received (" << mUserInput << "). Exiting program." << std::endl;
         }
         else if (!mUserInput.empty() && mUserInput.back() == '0')
         {

@@ -19,14 +19,13 @@ namespace kyc
         std::condition_variable_any &mCV;
         std::shared_timed_mutex &mMutex;
         bool &mSearchCanceled;
-        bool const mEventHandler;
         std::string mBufferedInput{};
         std::thread mThread{};
         char getKeyboardInput() const;
         void inputLoop();
 
     public:
-        EventHandler(std::condition_variable_any &cv, std::shared_timed_mutex &mutex, bool &searchCanceled, bool eventHandler);
+        EventHandler(std::condition_variable_any &cv, std::shared_timed_mutex &mutex, bool &searchCanceled);
         ~EventHandler();
         std::string getBufferedString() const;
     };

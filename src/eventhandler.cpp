@@ -4,12 +4,9 @@
 
 namespace kyc
 {
-    EventHandler::EventHandler(std::condition_variable_any &cv, std::shared_timed_mutex &mutex, bool &searchCanceled, bool eventHandler) : mCV{cv}, mMutex{mutex}, mSearchCanceled{searchCanceled}, mEventHandler{std::move(eventHandler)}
+    EventHandler::EventHandler(std::condition_variable_any &cv, std::shared_timed_mutex &mutex, bool &searchCanceled) : mCV{cv}, mMutex{mutex}, mSearchCanceled{searchCanceled}
     {
-        if (mEventHandler)
-        {
-            mThread = std::thread{&EventHandler::inputLoop, this};
-        }
+        mThread = std::thread{&EventHandler::inputLoop, this};
     }
 
     EventHandler::~EventHandler()
@@ -23,18 +20,20 @@ namespace kyc
     {
         while (true)
         {
-            char const input = getKeyboardInput();
+            //char const input = getKeyboardInput();
+            std::string input{};
+            std::cin >> input;
             std::cout << "Received character: " << input << std::endl;
             {
                 std::lock_guard<std::shared_timed_mutex> const lock{mMutex};
-                mBufferedInput.append(1, input);
+                mBufferedInput.append(input);
                 if (!mSearchCanceled)
                 {
                     mSearchCanceled = true;
                 }
             }
             mCV.notify_one();
-            if (input == '0' || mBufferedInput.length() == 5)
+            if (input == "0" || mBufferedInput.length() == 5)
             {
                 return;
             }
