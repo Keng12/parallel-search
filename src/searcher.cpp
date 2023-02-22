@@ -20,7 +20,6 @@ namespace kyc
         std::shared_ptr<kyc::vector<std::string>> output = std::make_shared<kyc::vector<std::string>>();
         if (inputData->getSize() > 0)
         {
-            mSearchFinished = false;
             postSearchJob(inputData, userInput, output);
             bool canceled{};
             {
@@ -28,14 +27,8 @@ namespace kyc
                 // Wait for input or until search is finished
                 mCV.wait(lock, [this]
                          { return mSearchFinished || mSearchCanceled; });
-
-                if (mSearchCanceled)
-                {
-                    // Search was canceled -> keep input data without modification
-                    canceled = true;
-                    mSearchCanceled = false;
-                    mSearchFinished = true;
-                }
+                mSearchFinished = true; // In case search got canceled -> Do not update output data
+                canceled = mSearchCanceled;
             }
             if (canceled) // Outside unique_lock
             {
@@ -63,6 +56,10 @@ namespace kyc
             nJobs = mWorkerThreads;
         }
         // Post jobs equal to number of working threads;
+        {
+            std::unique_lock<std::shared_timed_mutex> lock{mMutex};
+            mSearchCanceled = false;
+        }
         for (int i = 0; i < nJobs; ++i)
         {
             const auto job = [inputData, output_ptr, userInput, i, jobMutex, chunkSize, remainder, totalSize, totalCounter, this]()
