@@ -20,8 +20,8 @@ namespace kyc
         if (mEventHandler)
         {
             std::unique_lock<std::shared_timed_mutex> lock{mMutex};
-            std::string const bufferdInput = mEventHandlerThread.getBufferedString();
-            if (bufferdInput == mUserInput)
+            std::string const bufferedInput = mEventHandlerThread.getBufferedString();
+            if (bufferedInput == mUserInput)
             {
                 std::cout << "Enter character; press '0' to exit" << std::endl;
                 mCV.wait(lock);
@@ -36,7 +36,6 @@ namespace kyc
         }
         std::shared_ptr<kyc::vector<std::string>> output = std::make_shared<kyc::vector<std::string>>();
         mSearchFinished = false;
-        std::cout << "Input data size: " << inputData->getSize() << std::endl;
         if (inputData->getSize() > 0 && !mUserInput.empty() && mUserInput.back() != '0')
         {
             std::cout << "Searching for: " << mUserInput << std::endl;
@@ -51,7 +50,7 @@ namespace kyc
                 canceled = mSearchCanceled;
             }
             const std::chrono::duration<double> elapsedTime = std::chrono::steady_clock::now() - startTime;
-            std::cout << "Search time: " << elapsedTime.count() << " seconds. Count: " << output->getSize() << std::endl;
+            std::cout << "Search time: " << elapsedTime.count() << " seconds. Count: " << output->getSize() << " out of " << inputData->getSize() << std::endl;
             if (canceled) // Outside unique_lock, output not modified anymore after setting mSearchCanceled
             {
                 std::cout << "Search canceled" << std::endl;
@@ -62,18 +61,18 @@ namespace kyc
                 std::cout << "Search completed" << std::endl;
             }
         }
-        else if (inputData->getSize() == 0)
+        else if (!mUserInput.empty() && mUserInput.back() == '0')
         {
-            std::cout << "Input data empty, no search done" << std::endl;
+            std::cout << "'0' entered. Exiting program'" << std::endl;
         }
         else if (mUserInput.empty())
         {
             std::cout << "User input empty, no search done" << std::endl;
             output.swap(inputData); // Revert output to input if cancelled
         }
-        else if (!mUserInput.empty() && mUserInput.back() != '0')
+        else if (inputData->getSize() == 0)
         {
-            std::cout << "'0' entered. Exiting program'" << std::endl;
+            std::cout << "Input data empty, no search done" << std::endl;
         }
         return output;
     }
