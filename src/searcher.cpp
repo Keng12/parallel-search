@@ -25,7 +25,8 @@ namespace kyc
             if (bufferedInput == mUserInput)
             {
                 std::cout << "Enter character; press '0' to exit" << std::endl;
-                mCV.wait(lock, [this] {return mUserInput != mEventHandlerThread.getBufferedString();});
+                mCV.wait(lock, [this]
+                         { return mUserInput != mEventHandlerThread.getBufferedString(); });
                 mUserInput = mEventHandlerThread.getBufferedString();
             }
             else
@@ -37,11 +38,10 @@ namespace kyc
         if (inputData->getSize() > 0 && !mUserInput.empty() && mUserInput.back() != '0' && mUserInput.length() < 5)
         {
             std::cout << "Searching for: " << mUserInput << std::endl;
+            bool canceled{};
             auto const startTime = std::chrono::steady_clock::now();
             postSearchJob(inputData, output);
-            bool canceled{};
             {
-                // Event handler: 1. Get input, 2. If search not cancelled -> cancel search, notify main thread
                 std::unique_lock<std::shared_timed_mutex> lock{mMutex};
                 mCV.wait(lock, [this]
                          { return mSearchFinished || mSearchCanceled; }); // Wait for input event or until search is finished
@@ -49,9 +49,10 @@ namespace kyc
             }
             const std::chrono::duration<double> elapsedTime = std::chrono::steady_clock::now() - startTime;
             std::cout << "Search time: " << elapsedTime.count() << " seconds. Count: " << output->getSize() << " out of " << inputData->getSize() << std::endl;
-            if (canceled) // Outside unique_lock, output not modified anymore after setting mSearchCanceled
+            if (canceled)
             {
                 std::cout << "Search canceled" << std::endl;
+                // Outside unique_lock, output not modified anymore after setting mSearchCanceled
                 output.swap(inputData); // Revert output to input if cancelled
             }
             else

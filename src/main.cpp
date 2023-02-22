@@ -43,10 +43,10 @@ int main(int argc, char *argv[])
                 std::cout << "Save results to: " << filename << std::endl;
                 ++counter;
                 filename = basename + std::to_string(counter) + ".txt";
-                // Increment search -> look for subset of input data -> swap input data with output data
+                
             }
             std::cout << "_____________________________________________________" << std::endl;
-            data.swap(results);
+            data.swap(results); // Increment search -> look for subset of input data -> swap input data with output data
         }
     }
     catch (std::exception const &e)
