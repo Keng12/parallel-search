@@ -109,8 +109,18 @@ namespace kyc
                 std::cout << "Entering while-loop: " << i << std::endl;
                 while (!getSearchCanceled())
                 {
-                    if (size == index) // Counter has been reached
+                    if (size == index)
+                    /*
+                        Counter has been reached
+                        With event handler: Check before each mutex lock if search has been canceled and return if true instead of working
+                    */
                     {
+                        // Append to output vector if necessary
+                        if (tmpOutput.getSize() > 0)
+                        {
+                            std::lock_guard<std::mutex> const lock{*jobMutex};
+                            output_ptr->append(tmpOutput);
+                        }
                         // Increment and check total counter or return if canceled
                         int tmpCounter{};
                         {
@@ -118,13 +128,7 @@ namespace kyc
                             *totalCounter += index;
                             tmpCounter = *totalCounter;
                         }
-                        // Append to output vector or return if canceled
-                        if (tmpOutput.getSize() > 0)
-                        {
-                            std::lock_guard<std::mutex> const lock{*jobMutex};
-                            output_ptr->append(tmpOutput);
-                        }
-                        // Notify main thread and finish or return if cancelled
+                        // Notify main thread if search finished
                         if (totalSize == tmpCounter)
                         {
                             notifyMainThread();
