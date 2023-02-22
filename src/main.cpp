@@ -25,18 +25,25 @@ int main(int argc, char *argv[])
         while (true)
         {
             std::shared_ptr<kyc::vector<std::string>> results = searcher.search(data);
-            std::stringstream ss{};
-            for (int i = 0; i < results->getSize(); ++i)
+            if (results->getSize() == 0)
             {
-                ss << results->at(i) << "\n";
+                break;
             }
-            std::ofstream out{filename};
-            out << ss.str();
-            ++counter;
-            filename = basename + std::to_string(counter) + ".txt";
-            // Increment search -> look for subset of input data -> swap input data with output data
-            data.swap(results);
-            std::cout << "Save results to: "<< filename << "\n_____________________________________________________" << std::endl;
+            else
+            {
+                std::stringstream ss{};
+                for (int i = 0; i < results->getSize(); ++i)
+                {
+                    ss << results->at(i) << "\n";
+                }
+                std::ofstream out{filename};
+                out << ss.str();
+                ++counter;
+                filename = basename + std::to_string(counter) + ".txt";
+                // Increment search -> look for subset of input data -> swap input data with output data
+                data.swap(results);
+                std::cout << "Save results to: " << filename << "\n_____________________________________________________" << std::endl;
+            }
         }
     }
     catch (std::exception const &e)
