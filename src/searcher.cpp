@@ -20,11 +20,12 @@ namespace kyc
         std::shared_ptr<kyc::vector<std::string>> output = std::make_shared<kyc::vector<std::string>>();
         {
             // Wait for input event to get user input
-            // Event handler -> construct input based on incoming characters
+            // Event handler -> construct input string based on incoming characters
             // Retrieve input here, wait if no input available
             // Set boolean to false after retrieving input
             std::lock_guard<std::shared_timed_mutex> lock{mMutex};
             mSearchCanceled = false;
+            // In demo: Use user input provided by std::cin instead
         }
         mSearchFinished = false;
         std::cout << "Input data size: " << inputData->getSize() << std::endl;
@@ -40,12 +41,20 @@ namespace kyc
                 mSearchFinished = true;                                   // In case search got canceled -> Do not update output data
                 canceled = mSearchCanceled;
             }
-            if (canceled) // Outside unique_lock, not modified anymore after setting mSearchFinished
+            if (canceled) // Outside unique_lock, output not modified anymore after setting mSearchFinished
             {
+                std::cout << "Search canceled" << std::endl;
                 output.swap(inputData);
             }
+            else
+            {
+                std::cout << "Search completed" << std::endl;
+            }
         }
-        std::cout << "Finished search" << std::endl;
+        else
+        {
+            std::cout << "User input empty, no search done" << std::endl;
+        }
         return output;
     }
 
