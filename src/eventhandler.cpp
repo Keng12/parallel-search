@@ -14,7 +14,10 @@ namespace kyc
 
     EventHandler::~EventHandler()
     {
-        mThread.join();
+        if (mThread.joinable())
+        {
+            mThread.join();
+        }
     }
     void EventHandler::inputLoop()
     {
