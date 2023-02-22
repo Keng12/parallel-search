@@ -18,18 +18,18 @@ namespace kyc
     std::shared_ptr<kyc::vector<std::string>> Searcher::search(std::shared_ptr<kyc::vector<std::string>> inputData, const std::string &userInput)
     {
         std::shared_ptr<kyc::vector<std::string>> output = std::make_shared<kyc::vector<std::string>>();
-        // Wait input event
-                        std::cout << "Input data size: " << inputData->getSize() << std::endl;
+        // Wait for input event to get user input
+        std::cout << "Input data size: " << inputData->getSize() << std::endl;
         if (inputData->getSize() > 0)
         {
             postSearchJob(inputData, userInput, output);
             bool canceled{};
             {
+                // Event handler: 1. Get input, 2. If search not cancelled -> cancel search, notify main thread
                 std::unique_lock<std::shared_timed_mutex> lock{mMutex};
-                // Wait for input event or until search is finished
                 mCV.wait(lock, [this]
-                         { return mSearchFinished || mSearchCanceled; });
-                mSearchFinished = true; // In case search got canceled -> Do not update output data
+                         { return mSearchFinished || mSearchCanceled; }); // Wait for input event or until search is finished
+                mSearchFinished = true;                                   // In case search got canceled -> Do not update output data
                 canceled = mSearchCanceled;
             }
             if (canceled) // Outside unique_lock, not modified anymore after setting mSearchFinished
@@ -58,11 +58,9 @@ namespace kyc
             nJobs = mWorkerThreads;
         }
         // Post jobs equal to number of working threads;
-        //Get input,
-        // If search not cancelled -> cancel search, notify main thread
         {
             std::lock_guard<std::shared_timed_mutex> lock{mMutex};
-            mSearchCanceled  = false;
+            mSearchCanceled = false;
         }
         mSearchFinished = false;
         for (int i = 0; i < nJobs; ++i)
