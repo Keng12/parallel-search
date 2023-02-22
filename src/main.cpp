@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
             filename = basename + std::to_string(counter) + ".txt";
             // Increment search -> look for substring
             data.swap(results);
-            std::cout << "_____________________________________________________" << std::endl;
+            std::cout << "Save results to: "<< filename << "\n_____________________________________________________" << std::endl;
         }
     }
     catch (std::exception const &e)
