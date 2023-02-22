@@ -61,7 +61,7 @@ namespace kyc
         }
         else if (mUserInput.length() >= 5)
         {
-            std::cout << "More than four characters were received (" << mUserInput << "). Exiting program." << std::endl;
+            std::cout << "More than four characters were received ('" << mUserInput << "'). Exiting program." << std::endl;
         }
         else if (mUserInput.empty())
         {
