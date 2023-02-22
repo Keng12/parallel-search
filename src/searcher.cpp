@@ -21,15 +21,16 @@ namespace kyc
         mUserInput.clear();
         if (mEventHandler)
         {
-            // Wait for input event to get user input
-            // Event handler -> List of characters
-            // Event handler -> construct input string by appending incoming characters
-            // Get input here, wait if no new input available
-            // Set boolean to false after retrieving input
-            // Keep current search string; compare and wait if equal to buffered string in event handler
-            std::lock_guard<std::shared_timed_mutex> lock{mMutex};
+            std::unique_lock<std::shared_timed_mutex> lock{mMutex};
+            /*
+            - eventHandler.bufferedString -> Buffered string to search
+            - Construct input string by appending incoming characters to buffered string
+            if (mUserInput == eventHandler.bufferedString){
+                waitForNewEvent(); // If (!mSearchCanceled) mSearchCanceled = true; notify thread
+            }
+            mUserInput = eventHandler.bufferedString;
             mSearchCanceled = false;
-            // In demo: Use user input provided by std::cin instead
+            */
         }
         else
         {
