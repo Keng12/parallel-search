@@ -17,7 +17,6 @@ namespace kyc
 
     std::shared_ptr<kyc::vector<std::string>> Searcher::search(std::shared_ptr<kyc::vector<std::string>> inputData)
     {
-        std::shared_ptr<kyc::vector<std::string>> output = std::make_shared<kyc::vector<std::string>>();
         if (mEventHandler)
         {
             std::unique_lock<std::shared_timed_mutex> lock{mMutex};
@@ -35,6 +34,7 @@ namespace kyc
             std::cin >> mUserInput;
             std::cout << "Searching for: " << mUserInput << std::endl;
         }
+        std::shared_ptr<kyc::vector<std::string>> output = std::make_shared<kyc::vector<std::string>>();
         mSearchFinished = false;
         std::cout << "Input data size: " << inputData->getSize() << std::endl;
         if (inputData->getSize() > 0)

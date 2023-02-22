@@ -1,5 +1,5 @@
 #include "eventhandler.hpp"
-#include <conio.h>
+
 namespace kyc
 {
     EventHandler::EventHandler(std::condition_variable_any &cv, std::shared_timed_mutex &mutex, bool &searchCanceled, bool &eventHandler) : mCV{cv}, mMutex{mutex}, mSearchCanceled{searchCanceled}, mEventHandler{eventHandler}
@@ -10,24 +10,39 @@ namespace kyc
         }
     }
 
+    EventHandler::~EventHandler()
+    {
+        mThread.join();
+    }
     void EventHandler::inputLoop()
     {
-        char input = getKeyboardInput();
+        while (true)
         {
-            std::lock_guard<std::shared_timed_mutex> const lock{mMutex};
-            mBufferedInput.append(1, input);
-            if (!mSearchCanceled)
+            char input = getKeyboardInput();
+            if (input != '0')
             {
-                mSearchCanceled = true;
+                std::lock_guard<std::shared_timed_mutex> const lock{mMutex};
+                mBufferedInput.append(1, input);
+                if (!mSearchCanceled)
+                {
+                    mSearchCanceled = true;
+                }
             }
+            else
+            {
+                mCV.notify_one();
+                return;
+            }
+            mCV.notify_one();
         }
-        mCV.notify_one();
     }
+
     char EventHandler::getKeyboardInput()
     {
         char input = 'A';
         return input;
     }
+    
     std::string EventHandler::getBufferedString() const
     {
         return mBufferedInput;

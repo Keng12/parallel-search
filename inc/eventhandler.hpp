@@ -24,6 +24,7 @@ namespace kyc
         std::thread mThread{};
         char getKeyboardInput();
         void inputLoop();
+        EventHandler::~EventHandler();
 
     public:
         EventHandler(std::condition_variable_any &cv, std::shared_timed_mutex &mutex, bool &searchCanceled, bool &eventHandler);
