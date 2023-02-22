@@ -20,9 +20,11 @@ namespace kyc
         std::shared_ptr<kyc::vector<std::string>> output = std::make_shared<kyc::vector<std::string>>();
         {
             // Wait for input event to get user input
-            // Event handler -> construct input string based on incoming characters
-            // Retrieve input here, wait if no input available
+            // Event handler -> List of characters
+            // Event handler -> construct input string by appending incoming characters
+            // Get input here, wait if no new input available 
             // Set boolean to false after retrieving input
+            // Keep current search string; compare and wait if equal to buffered string in event handler 
             std::lock_guard<std::shared_timed_mutex> lock{mMutex};
             mSearchCanceled = false;
             // In demo: Use user input provided by std::cin instead
