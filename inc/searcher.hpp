@@ -8,7 +8,7 @@
 
 #include "threadpool.hpp"
 #include "vector.hpp"
-
+#include "eventhandler.hpp"
 // Create lambda function to take indices as pass by copy/reference?
 // Check if indices empty -> Yes: Quit
 // No: Pop and continue
@@ -25,6 +25,7 @@ namespace kyc
     bool getSearchCanceled();
     std::string mUserInput{};
     bool mEventHandler{};
+    kyc::EventHandler mEventHandlerThread;
 
   public:
     Searcher(const int nThreads);

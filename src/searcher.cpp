@@ -10,7 +10,7 @@
 // No: Pop and continue
 namespace kyc
 {
-    Searcher::Searcher(int nThreads) : mWorkerThreads{std::move(nThreads)}, mThreadpool{mWorkerThreads}
+    Searcher::Searcher(int nThreads) : mWorkerThreads{std::move(nThreads)}, mThreadpool{mWorkerThreads}, mEventHandlerThread{mCV, mMutex, mSearchCanceled, mEventHandler}
     {
         assert(mWorkerThreads > 0);
     };
@@ -22,6 +22,13 @@ namespace kyc
         if (mEventHandler)
         {
             std::unique_lock<std::shared_timed_mutex> lock{mMutex};
+            std::string const bufferdInput = mEventHandlerThread.getBufferedString();
+            if (bufferdInput == mUserInput)
+            {
+                mCV.wait(lock);
+            }
+            mUserInput = bufferdInput;
+            mSearchCanceled = false;
             /*
             - eventHandler.bufferedString -> Buffered string to search
             - Construct input string by appending incoming characters to buffered string
