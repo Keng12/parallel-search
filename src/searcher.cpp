@@ -25,7 +25,7 @@ namespace kyc
             if (bufferedInput == mUserInput)
             {
                 std::cout << "Enter character; press '0' to exit" << std::endl;
-                mCV.wait(lock);
+                mCV.wait(lock, [this] {return mUserInput != mEventHandlerThread.getBufferedString();});
                 mUserInput = mEventHandlerThread.getBufferedString();
             }
             else
