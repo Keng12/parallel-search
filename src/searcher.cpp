@@ -52,7 +52,6 @@ namespace kyc
                 std::unique_lock<std::shared_timed_mutex> lock{mMutex};
                 mCV.wait(lock, [this]
                          { return mSearchFinished || mSearchCanceled; }); // Wait for input event or until search is finished
-                mSearchFinished = true;                                   // In case search got canceled -> Do not update output data
                 canceled = mSearchCanceled;
             }
             const std::chrono::duration<double> elapsedTime = std::chrono::steady_clock::now() - startTime;
@@ -60,7 +59,7 @@ namespace kyc
             if (canceled) // Outside unique_lock, output not modified anymore after setting mSearchCanceled
             {
                 std::cout << "Search canceled" << std::endl;
-                output.swap(inputData); // Revert output to input
+                output.swap(inputData); // Revert output to input if cancelled
             }
             else
             {
