@@ -116,12 +116,12 @@ namespace kyc
                             *totalCounter += index;
                             tmpCounter = *totalCounter;
                         }
-                        if (tmpOutput.getSize() > 0)
+                        if (tmpOutput.getSize() > 0 && !getSearchCanceled())
                         {
                             std::lock_guard<std::mutex> const lock{*jobMutex};
                             output_ptr->append(tmpOutput);
                         }
-                        if (totalSize == tmpCounter)
+                        if (totalSize == tmpCounter && !getSearchFinished())
                         {
                             notifyMainThread();
                         }
