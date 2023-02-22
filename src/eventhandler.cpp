@@ -19,7 +19,6 @@ namespace kyc
         while (true)
         {
             char input = getKeyboardInput();
-            if (input != '0')
             {
                 std::lock_guard<std::shared_timed_mutex> const lock{mMutex};
                 mBufferedInput.append(1, input);
@@ -28,12 +27,11 @@ namespace kyc
                     mSearchCanceled = true;
                 }
             }
-            else
+            mCV.notify_one();
+            if (input != '0')
             {
-                mCV.notify_one();
                 return;
             }
-            mCV.notify_one();
         }
     }
 
@@ -42,7 +40,7 @@ namespace kyc
         char input = 'A';
         return input;
     }
-    
+
     std::string EventHandler::getBufferedString() const
     {
         return mBufferedInput;
