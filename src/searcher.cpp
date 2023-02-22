@@ -95,7 +95,7 @@ namespace kyc
                             std::lock_guard<std::mutex> const lock{*jobMutex};
                             output_ptr->append(tmpOutput);
                         }
-                        if (totalSize == tmpCounter)
+                        if (totalSize == tmpCounter  && !getSearchFinished())
                         {
                             notifyMainThread();
                         }
