@@ -21,7 +21,6 @@ namespace kyc
     std::condition_variable mCV{};
     std::mutex mMutex{};
     bool mSearchFinished{};
-    std::atomic<int> mTotalCounter{};
     bool getSearchCanceled();
 
   public:
