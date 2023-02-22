@@ -65,7 +65,6 @@ namespace kyc
         else if (inputData->getSize() == 0)
         {
             std::cout << "Input data, no search done" << std::endl;
-            output.swap(inputData); // Revert output to input if cancelled
         }
         else if (mUserInput.empty())
         {
