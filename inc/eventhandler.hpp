@@ -22,7 +22,7 @@ namespace kyc
         bool &mEventHandler;
         std::string mBufferedInput{};
         std::thread mThread{};
-        char getKeyboardInput();
+        char getKeyboardInput() const;
         void inputLoop();
 
     public:

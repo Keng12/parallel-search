@@ -20,7 +20,7 @@ namespace kyc
     {
         while (true)
         {
-            char input = getKeyboardInput();
+            char const input = getKeyboardInput();
             std::cout << "Received character: " << input << std::endl;
             {
                 std::lock_guard<std::shared_timed_mutex> const lock{mMutex};
@@ -38,7 +38,7 @@ namespace kyc
         }
     }
 
-    char EventHandler::getKeyboardInput()
+    char EventHandler::getKeyboardInput() const
     {
         char input = 'A';
         // char input = _getch();
