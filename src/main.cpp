@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
                 std::cout << "Exiting program" << std::endl;
                 break;
             }
-            else
+            else if (results->getSize() > 0)
             {
                 std::stringstream ss{};
                 for (int i = 0; i < results->getSize(); ++i)
