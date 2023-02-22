@@ -110,20 +110,36 @@ namespace kyc
                 {
                     if (size == index) // Counter has been reached
                     {
-                        int tmpCounter{};
+                        if (!getSearchCanceled())
                         {
-                            std::lock_guard<std::mutex> const lock{*jobMutex};
-                            *totalCounter += index;
-                            tmpCounter = *totalCounter;
-                        }
-                        if (tmpOutput.getSize() > 0 && !getSearchCanceled())
-                        {
-                            std::lock_guard<std::mutex> const lock{*jobMutex};
-                            output_ptr->append(tmpOutput);
-                        }
-                        if (totalSize == tmpCounter && !getSearchCanceled())
-                        {
-                            notifyMainThread();
+                            int tmpCounter{};
+                            if (!getSearchCanceled())
+                            {
+                                std::lock_guard<std::mutex> const lock{*jobMutex};
+                                *totalCounter += index;
+                                tmpCounter = *totalCounter;
+                            }
+                            else
+                            {
+                                return;
+                            }
+                            if (tmpOutput.getSize() > 0 && !getSearchCanceled())
+                            {
+                                std::lock_guard<std::mutex> const lock{*jobMutex};
+                                output_ptr->append(tmpOutput);
+                            }
+                            else
+                            {
+                                return;
+                            }
+                            if (totalSize == tmpCounter && !getSearchCanceled())
+                            {
+                                notifyMainThread();
+                            }
+                            else
+                            {
+                                return;
+                            }
                         }
                         return;
                     }
