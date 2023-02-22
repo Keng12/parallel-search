@@ -27,7 +27,7 @@ namespace kyc
             - Construct input string by appending incoming characters to buffered string
             - Event handler: if (!mSearchCanceled) {mSearchCanceled = true; notify main thread}
             if (mUserInput == eventHandler.bufferedString){
-                waitForNewEvent(); // 
+                waitForNewEvent(); //
             }
             mUserInput = eventHandler.bufferedString;
             mSearchCanceled = false;
@@ -116,12 +116,12 @@ namespace kyc
                             *totalCounter += index;
                             tmpCounter = *totalCounter;
                         }
-                        if (tmpOutput.getSize() > 0 && !getSearchFinished())
+                        if (tmpOutput.getSize() > 0)
                         {
                             std::lock_guard<std::mutex> const lock{*jobMutex};
                             output_ptr->append(tmpOutput);
                         }
-                        if (totalSize == tmpCounter && !getSearchFinished())
+                        if (totalSize == tmpCounter)
                         {
                             notifyMainThread();
                         }
