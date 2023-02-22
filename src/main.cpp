@@ -43,8 +43,8 @@ int main(int argc, char *argv[])
                 ++counter;
                 filename = basename + std::to_string(counter) + ".txt";
                 // Increment search -> look for subset of input data -> swap input data with output data
-                data.swap(results);
             }
+            data.swap(results);
         }
     }
     catch (std::exception const &e)
