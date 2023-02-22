@@ -163,6 +163,10 @@ namespace kyc
             std::shared_lock<std::shared_timed_mutex> const lock{mMutex};
             tmpBool = mSearchCanceled;
         }
+        if (tmpBool)
+        {
+            std::cout << "Search cancelled" << std::endl;
+        }
         return tmpBool;
     }
 
