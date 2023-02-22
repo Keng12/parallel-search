@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
         while (true)
         {
             std::shared_ptr<kyc::vector<std::string>> results = searcher.search(data);
-            if (results->getSize() == 0)
+            if (searcher.getLastInput() == '0')
             {   
                 std::cout << "Exiting program" << std::endl;
                 break;

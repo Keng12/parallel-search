@@ -165,4 +165,10 @@ namespace kyc
         }
         return tmpBool;
     }
+
+    char Searcher::getLastInput() const
+    {
+        return mUserInput.back();
+    }
+
 }; // namespace kyc
