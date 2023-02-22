@@ -39,11 +39,12 @@ int main(int argc, char *argv[])
                 }
                 std::ofstream out{filename};
                 out << ss.str();
-                std::cout << "Save results to: " << filename << "\n_____________________________________________________" << std::endl;
+                std::cout << "Save results to: " << filename << std::endl;
                 ++counter;
                 filename = basename + std::to_string(counter) + ".txt";
                 // Increment search -> look for subset of input data -> swap input data with output data
             }
+            std::cout << "_____________________________________________________" << std::endl;
             data.swap(results);
         }
     }

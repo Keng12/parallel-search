@@ -64,7 +64,7 @@ namespace kyc
         }
         else if (inputData->getSize() == 0)
         {
-            std::cout << "Input data, no search done" << std::endl;
+            std::cout << "Input data empty, no search done" << std::endl;
         }
         else if (mUserInput.empty())
         {
