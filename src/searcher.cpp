@@ -56,10 +56,10 @@ namespace kyc
             }
             const std::chrono::duration<double> elapsedTime = std::chrono::steady_clock::now() - startTime;
             std::cout << "Search time: " << elapsedTime.count() << " seconds. Count: " << output->getSize() << std::endl;
-            if (canceled) // Outside unique_lock, output not modified anymore after setting mSearchFinished
+            if (canceled) // Outside unique_lock, output not modified anymore after setting mSearchCanceled
             {
                 std::cout << "Search canceled" << std::endl;
-                output.swap(inputData);
+                output.swap(inputData); // Revert output to input
             }
             else
             {
@@ -121,7 +121,7 @@ namespace kyc
                             std::lock_guard<std::mutex> const lock{*jobMutex};
                             output_ptr->append(tmpOutput);
                         }
-                        if (totalSize == tmpCounter && !getSearchFinished())
+                        if (totalSize == tmpCounter && !getSearchCanceled())
                         {
                             notifyMainThread();
                         }
@@ -148,16 +148,6 @@ namespace kyc
         }
         mCV.notify_one();
         return;
-    }
-
-    bool Searcher::getSearchFinished()
-    {
-        bool tmpBool{};
-        {
-            std::shared_lock<std::shared_timed_mutex> const lock{mMutex};
-            tmpBool = mSearchFinished;
-        }
-        return tmpBool;
     }
 
     bool Searcher::getSearchCanceled()

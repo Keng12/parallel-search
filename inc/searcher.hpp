@@ -23,7 +23,6 @@ namespace kyc
     std::shared_timed_mutex mMutex{};
     bool mSearchFinished{};
     bool getSearchCanceled();
-    bool getSearchFinished();
     std::string mUserInput{};
     bool mEventHandler{};
 
