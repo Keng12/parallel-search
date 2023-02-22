@@ -23,6 +23,7 @@ namespace kyc
             std::string const bufferdInput = mEventHandlerThread.getBufferedString();
             if (bufferdInput == mUserInput)
             {
+                std::cout << "Enter character; press '0' to exit" << std::endl;
                 mCV.wait(lock);
             }
             mUserInput = mEventHandlerThread.getBufferedString();
@@ -33,12 +34,12 @@ namespace kyc
             std::cout << "Enter search string:" << std::endl;
             std::cin >> mUserInput;
         }
-        std::cout << "Searching for: " << mUserInput << std::endl;
         std::shared_ptr<kyc::vector<std::string>> output = std::make_shared<kyc::vector<std::string>>();
         mSearchFinished = false;
         std::cout << "Input data size: " << inputData->getSize() << std::endl;
         if (inputData->getSize() > 0 && !mUserInput.empty() && mUserInput.back() != '0')
         {
+            std::cout << "Searching for: " << mUserInput << std::endl;
             auto const startTime = std::chrono::steady_clock::now();
             postSearchJob(inputData, output);
             bool canceled{};
