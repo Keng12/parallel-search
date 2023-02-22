@@ -30,7 +30,6 @@ namespace kyc
     Searcher(const int nThreads, bool &searchCanceled);
     void postSearchJob(std::shared_ptr<kyc::vector<std::string>> inputData, std::shared_ptr<kyc::vector<std::string>> output_ptr);
     std::shared_ptr<kyc::vector<std::string>> search(std::shared_ptr<kyc::vector<std::string>> inputData);
-    void stop();
     void notifyMainThread();
   };
 } // namespace kyc

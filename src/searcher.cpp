@@ -150,8 +150,6 @@ namespace kyc
             mThreadpool.postJob(job);
         }
     };
-
-    void Searcher::stop() { mThreadpool.stop(); };
     void Searcher::notifyMainThread()
     {
         {
