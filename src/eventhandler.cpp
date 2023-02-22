@@ -1,3 +1,5 @@
+// #include<conio.h>
+
 #include "eventhandler.hpp"
 
 namespace kyc
@@ -38,6 +40,7 @@ namespace kyc
     char EventHandler::getKeyboardInput()
     {
         char input = 'A';
+        // char input = _getch();
         return input;
     }
 
