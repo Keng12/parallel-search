@@ -18,7 +18,15 @@ namespace kyc
     std::shared_ptr<kyc::vector<std::string>> Searcher::search(std::shared_ptr<kyc::vector<std::string>> inputData, const std::string &userInput)
     {
         std::shared_ptr<kyc::vector<std::string>> output = std::make_shared<kyc::vector<std::string>>();
-        // Wait for input event to get user input
+        {
+            // Wait for input event to get user input
+            // Event handler -> construct input based on incoming characters
+            // Retrieve input here, wait if no input available
+            // Set boolean to false after retrieving input
+            std::lock_guard<std::shared_timed_mutex> lock{mMutex};
+            mSearchCanceled = false;
+        }
+        mSearchFinished = false;
         std::cout << "Input data size: " << inputData->getSize() << std::endl;
         if (inputData->getSize() > 0)
         {
@@ -57,12 +65,6 @@ namespace kyc
         {
             nJobs = mWorkerThreads;
         }
-        // Post jobs equal to number of working threads;
-        {
-            std::lock_guard<std::shared_timed_mutex> lock{mMutex};
-            mSearchCanceled = false;
-        }
-        mSearchFinished = false;
         for (int i = 0; i < nJobs; ++i)
         {
             const auto job = [inputData, output_ptr, userInput, i, jobMutex, chunkSize, remainder, totalSize, totalCounter, this]()
@@ -95,7 +97,7 @@ namespace kyc
                             std::lock_guard<std::mutex> const lock{*jobMutex};
                             output_ptr->append(tmpOutput);
                         }
-                        if (totalSize == tmpCounter  && !getSearchFinished())
+                        if (totalSize == tmpCounter && !getSearchFinished())
                         {
                             notifyMainThread();
                         }
