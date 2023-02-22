@@ -20,9 +20,8 @@ int main(int argc, char *argv[])
         std::pair<std::string, int> filedata = kyc::getFilename(basename);
         std::string filename = filedata.first;
         int counter = filedata.second;
-        bool searchCanceled{};
         std::shared_ptr<kyc::vector<std::string>> data = kyc::setupData("input.txt");
-        kyc::Searcher searcher{nThreads, searchCanceled};
+        kyc::Searcher searcher{nThreads};
         while (true)
         {
             std::shared_ptr<kyc::vector<std::string>> results = searcher.search(data);

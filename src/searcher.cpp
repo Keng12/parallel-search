@@ -10,7 +10,7 @@
 // No: Pop and continue
 namespace kyc
 {
-    Searcher::Searcher(int nThreads, bool &searchCanceled) : mWorkerThreads{std::move(nThreads)}, mThreadpool{mWorkerThreads}, mSearchCanceled{searchCanceled}
+    Searcher::Searcher(int nThreads) : mWorkerThreads{std::move(nThreads)}, mThreadpool{mWorkerThreads}
     {
         assert(mWorkerThreads > 0);
     };
