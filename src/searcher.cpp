@@ -62,10 +62,19 @@ namespace kyc
                 std::cout << "Search completed" << std::endl;
             }
         }
-        else
+        else if (inputData->getSize() == 0)
+        {
+            std::cout << "Input data, no search done" << std::endl;
+            output.swap(inputData); // Revert output to input if cancelled
+        }
+        else if (mUserInput.empty())
         {
             std::cout << "User input empty, no search done" << std::endl;
             output.swap(inputData); // Revert output to input if cancelled
+        }
+        else if (!mUserInput.empty() && mUserInput.back() != '0')
+        {
+            std::cout << "'0' entered. Exiting program'" << std::endl;
         }
         return output;
     }
@@ -163,10 +172,6 @@ namespace kyc
         {
             std::shared_lock<std::shared_timed_mutex> const lock{mMutex};
             tmpBool = mSearchCanceled;
-        }
-        if (tmpBool)
-        {
-            std::cout << "Search cancelled" << std::endl;
         }
         return tmpBool;
     }
