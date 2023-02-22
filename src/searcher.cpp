@@ -59,6 +59,7 @@ namespace kyc
                     if (size == index) // Counter has been reached
                     {
                         mTotalCounter += index;
+                        if (tmpOutput.getSize() > 0)
                         {
                             std::lock_guard<std::mutex> const lock{*jobMutex};
                             output_ptr->append(tmpOutput);
