@@ -36,8 +36,15 @@ namespace kyc
         const int totalSize = inputData->getSize();
         const int chunkSize = totalSize / mWorkerThreads;
         const int remainder = totalSize % mWorkerThreads;
+        int nJobs{};
+        if (chunkSize == 0){
+            nJobs = remainder;
+        }
+        else {
+            nJobs = mWorkerThreads;
+        }
         // Post jobs equal to number of working threads;
-        for (int i = 0; i < mWorkerThreads; ++i)
+        for (int i = 0; i < nJobs; ++i)
         {
             const auto job = [inputData, output_ptr, userInput, i, jobMutex, chunkSize, remainder, totalSize, this]()
             {
