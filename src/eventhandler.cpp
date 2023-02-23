@@ -4,7 +4,7 @@
 
 namespace kyc
 {
-    EventHandler::EventHandler(std::condition_variable_any &cv, std::shared_timed_mutex &mutex, bool &searchCanceled) : mCV{cv}, mMutex{mutex}, mSearchCanceled{searchCanceled}
+    EventHandler::EventHandler(std::condition_variable &cv, std::mutex &mutex, bool &searchCanceled) : mCV{cv}, mMutex{mutex}, mSearchCanceled{searchCanceled}
     {
         mThread = std::thread{&EventHandler::inputLoop, this};
     }
@@ -25,7 +25,7 @@ namespace kyc
             std::cin >> input;
             std::cout << "Received character: " << input << std::endl;
             {
-                std::lock_guard<std::shared_timed_mutex> const lock{mMutex};
+                std::lock_guard<std::mutex> const lock{mMutex};
                 mBufferedInput.append(input);
                 mSearchCanceled = true;
             }

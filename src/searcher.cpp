@@ -10,7 +10,7 @@
 // No: Pop and continue
 namespace kyc
 {
-    Searcher::Searcher(int nThreads) : mWorkerThreads{std::move(nThreads)}, mThreadpool{mWorkerThreads}, mEventHandlerThread{mCV, mMutex, mSearchCanceled}
+    Searcher::Searcher(int nThreads) : mWorkerThreads{std::move(nThreads)}, mThreadpool{mWorkerThreads}, mEventHandlerThread{mCV, mEventMutex, mSearchCanceled}
     {
         assert(mWorkerThreads > 0);
     };
@@ -20,7 +20,7 @@ namespace kyc
         std::shared_ptr<kyc::vector<std::string>> output = std::make_shared<kyc::vector<std::string>>();
         mSearchFinished = false;
         {
-            std::unique_lock<std::shared_timed_mutex> lock{mMutex};
+            std::unique_lock<std::mutex> lock{mEventMutex};
             std::string const bufferedInput = mEventHandlerThread.getBufferedString();
             if (bufferedInput == mUserInput)
             {
@@ -42,7 +42,7 @@ namespace kyc
             auto const startTime = std::chrono::steady_clock::now();
             postSearchJob(inputData, output);
             {
-                std::unique_lock<std::shared_timed_mutex> lock{mMutex};
+                std::unique_lock<std::mutex> lock{mSearchMutex};
                 mCV.wait(lock, [this]
                          { return mSearchFinished; }); // Wait for input event or until search is finished
                 canceled = mSearchCanceled;
@@ -135,7 +135,7 @@ namespace kyc
                             *totalCounter += index;
                             tmpCounter = *totalCounter;
                         }
-                        if (totalSize == tmpCounter &&)
+                        if (totalSize == tmpCounter)
                         {
                             // Notify main thread if search finished
                             notifyMainThread();
@@ -156,7 +156,7 @@ namespace kyc
     void Searcher::notifyMainThread()
     {
         {
-            std::lock_guard<std::shared_timed_mutex> const lock{mMutex};
+            std::lock_guard<std::mutex> const lock{mSearchMutex};
             mSearchFinished = true;
         }
         mCV.notify_one();
@@ -167,7 +167,7 @@ namespace kyc
     {
         bool tmpBool{};
         {
-            std::shared_lock<std::shared_timed_mutex> const lock{mMutex};
+            std::lock_guard<std::mutex> const lock{mEventMutex};
             tmpBool = mSearchCanceled;
         }
         return tmpBool;

@@ -19,8 +19,9 @@ namespace kyc
     int const mWorkerThreads;
     bool mSearchCanceled{};
     kyc::Threadpool mThreadpool;
-    std::condition_variable_any mCV{};
-    std::shared_timed_mutex mMutex{};
+    std::condition_variable mCV{};
+    std::mutex mSearchMutex{};
+    std::mutex mEventMutex{};
     bool mSearchFinished{};
     std::string mUserInput{};
     kyc::EventHandler mEventHandlerThread;

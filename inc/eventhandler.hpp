@@ -16,8 +16,8 @@ namespace kyc
 {
     class EventHandler
     {
-        std::condition_variable_any &mCV;
-        std::shared_timed_mutex &mMutex;
+        std::condition_variable &mCV;
+        std::mutex &mMutex;
         bool &mSearchCanceled;
         std::string mBufferedInput{};
         std::thread mThread{};
@@ -25,7 +25,7 @@ namespace kyc
         void inputLoop();
 
     public:
-        EventHandler(std::condition_variable_any &cv, std::shared_timed_mutex &mutex, bool &searchCanceled);
+        EventHandler(std::condition_variable &cv, std::mutex &mutex, bool &searchCanceled);
         ~EventHandler();
         std::string getBufferedString() const;
     };
