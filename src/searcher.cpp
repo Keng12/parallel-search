@@ -31,6 +31,7 @@ namespace kyc
             }
             else
             {
+                std::cout << "Received new input" << std::endl;
                 mUserInput = bufferedInput;
             }
             mSearchCanceled = false;
@@ -83,13 +84,15 @@ namespace kyc
     {
         std::shared_ptr<std::mutex> jobMutex = std::make_shared<std::mutex>();
         const int totalSize = inputData->getSize();
-        const int chunkSize = totalSize / mWorkerThreads;
-        const int remainder = totalSize % mWorkerThreads;
+        int chunkSize = totalSize / mWorkerThreads;
+        int remainder = totalSize % mWorkerThreads;
         std::shared_ptr<int> totalCounter = std::make_shared<int>();
         int nJobs{};
         if (chunkSize == 0)
         {
+            chunkSize = 1;
             nJobs = remainder;
+            remainder = 0;
         }
         else
         {
