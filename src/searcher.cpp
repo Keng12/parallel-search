@@ -50,7 +50,7 @@ namespace kyc
             const std::chrono::duration<double> elapsedTime = std::chrono::steady_clock::now() - startTime;
             if (interrupted)
             {
-                std::cout << "Search interrupted" << std::endl;
+                std::cout << "Search interrupted; do not print results" << std::endl;
                 // Outside unique_lock, output not modified anymore after setting mSearchInterrupted
                 output.swap(inputData); // Revert output to input if cancelled
             }
