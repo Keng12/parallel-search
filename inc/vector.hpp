@@ -27,7 +27,7 @@ namespace kyc
       assert(size > 0);
     }
 
-    std::unique_ptr<T[]> moveUniquePtr()
+    std::unique_ptr<T[]>&& moveUniquePtr()
     {
       return std::move(mArray);
     }
@@ -48,8 +48,7 @@ namespace kyc
     {
       mSize = input.getSize();
       mCapacity = mSize;
-      std::unique_ptr<T[]> tmpPtr = input.moveUniquePtr();
-      mArray.swap(tmpPtr);
+      mArray = input.moveUniquePtr();
       return *this;
     }
 
