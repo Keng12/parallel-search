@@ -38,19 +38,19 @@ namespace kyc
         if (inputData->getSize() > 0 && !mUserInput.empty() && mUserInput.back() != '0' && mUserInput.length() < 5)
         {
             std::cout << "Searching for: " << mUserInput << std::endl;
-            bool canceled{};
+            bool interrupted{};
             auto const startTime = std::chrono::steady_clock::now();
             postSearchJob(inputData, output);
             {
                 std::unique_lock<std::mutex> lock{mSearchMutex};
                 mCV.wait(lock, [this]
                          { return mSearchFinished; }); // Wait for input event or until search is finished
-                canceled = mSearchInterrupted;
+                interrupted = mSearchInterrupted;
             }
             const std::chrono::duration<double> elapsedTime = std::chrono::steady_clock::now() - startTime;
-            if (canceled)
+            if (interrupted)
             {
-                std::cout << "Search canceled" << std::endl;
+                std::cout << "Search interrupted" << std::endl;
                 // Outside unique_lock, output not modified anymore after setting mSearchInterrupted
                 output.swap(inputData); // Revert output to input if cancelled
             }
