@@ -59,7 +59,7 @@ namespace kyc
         }
         else if (!mUserInput.empty() && mUserInput.back() == '0')
         {
-            std::cout << "'0' entered. Exiting program'" << std::endl;
+            std::cout << "'0' entered. Exiting program" << std::endl;
         }
         else if (mUserInput.length() >= 5)
         {
