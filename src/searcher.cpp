@@ -118,7 +118,6 @@ namespace kyc
                 {
                     if (size == index)
                     {
-
                         // Lock mutex only if condition is fulfilled
                         if (tmpOutput.getSize() > 0)
                         {
