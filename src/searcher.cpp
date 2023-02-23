@@ -31,7 +31,6 @@ namespace kyc
             }
             else
             {
-                std::cout << "Received new input" << std::endl;
                 mUserInput = bufferedInput;
             }
             mSearchCanceled = false;
@@ -45,7 +44,7 @@ namespace kyc
             {
                 std::unique_lock<std::shared_timed_mutex> lock{mMutex};
                 mCV.wait(lock, [this]
-                         { return mSearchFinished || mSearchCanceled; }); // Wait for input event or until search is finished
+                         { return mSearchFinished; }); // Wait for input event or until search is finished
                 canceled = mSearchCanceled;
             }
             const std::chrono::duration<double> elapsedTime = std::chrono::steady_clock::now() - startTime;
@@ -117,38 +116,31 @@ namespace kyc
                 int index{};
                 using namespace std::chrono_literals;
                 std::this_thread::sleep_for(5s);
-                while (!getSearchCanceled())
+                while (true)
                 {
                     if (size == index)
                     {
-                        if (!getSearchCanceled())
+
+                        // If event handler is used: return after each check
+                        if (tmpOutput.getSize() > 0)
                         {
-                            // If event handler is used: return after each check
-                            if (tmpOutput.getSize() > 0 && !getSearchCanceled())
-                            {
-                                // Append to output vector if necessary
-                                std::lock_guard<std::mutex> const lock{*jobMutex};
-                                output_ptr->append(tmpOutput);
-                            }
-                            int tmpCounter{};
-                            if (!getSearchCanceled())
-                            {
-                                // Increment and check total counter or return if canceled
-                                std::lock_guard<std::mutex> const lock{*jobMutex};
-                                *totalCounter += index;
-                                tmpCounter = *totalCounter;
-                            }
-                            if (totalSize == tmpCounter && !getSearchCanceled())
-                            {
-                                // Notify main thread if search finished
-                                notifyMainThread();
-                            }
-                            return;
+                            // Append to output vector if necessary
+                            std::lock_guard<std::mutex> const lock{*jobMutex};
+                            output_ptr->append(tmpOutput);
                         }
-                        else
+                        int tmpCounter{};
                         {
-                            return;
+                            // Increment and check total counter or return if canceled
+                            std::lock_guard<std::mutex> const lock{*jobMutex};
+                            *totalCounter += index;
+                            tmpCounter = *totalCounter;
                         }
+                        if (totalSize == tmpCounter &&)
+                        {
+                            // Notify main thread if search finished
+                            notifyMainThread();
+                        }
+                        return;
                     }
                     std::string element{tmpData.at(index)};
                     if (0 == element.rfind(mUserInput, 0))
