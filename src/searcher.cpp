@@ -10,7 +10,7 @@
 // No: Pop and continue
 namespace kyc
 {
-    Searcher::Searcher(int nThreads) : mWorkerThreads{std::move(nThreads)}, mThreadpool{mWorkerThreads}, mEventHandlerThread{mCV, mEventMutex, msearchInterrupted}
+    Searcher::Searcher(int nThreads) : mWorkerThreads{std::move(nThreads)}, mThreadpool{mWorkerThreads}, mEventHandlerThread{mCV, mEventMutex, mSearchInterrupted}
     {
         assert(mWorkerThreads > 0);
     };
@@ -33,7 +33,7 @@ namespace kyc
             {
                 mUserInput = bufferedInput;
             }
-            msearchInterrupted = false;
+            mSearchInterrupted = false;
         }
         if (inputData->getSize() > 0 && !mUserInput.empty() && mUserInput.back() != '0' && mUserInput.length() < 5)
         {
@@ -45,13 +45,13 @@ namespace kyc
                 std::unique_lock<std::mutex> lock{mSearchMutex};
                 mCV.wait(lock, [this]
                          { return mSearchFinished; }); // Wait for input event or until search is finished
-                canceled = msearchInterrupted;
+                canceled = mSearchInterrupted;
             }
             const std::chrono::duration<double> elapsedTime = std::chrono::steady_clock::now() - startTime;
             if (canceled)
             {
                 std::cout << "Search canceled" << std::endl;
-                // Outside unique_lock, output not modified anymore after setting msearchInterrupted
+                // Outside unique_lock, output not modified anymore after setting mSearchInterrupted
                 output.swap(inputData); // Revert output to input if cancelled
             }
             else
@@ -168,7 +168,7 @@ namespace kyc
         bool tmpBool{};
         {
             std::lock_guard<std::mutex> const lock{mEventMutex};
-            tmpBool = msearchInterrupted;
+            tmpBool = mSearchInterrupted;
         }
         return tmpBool;
     }

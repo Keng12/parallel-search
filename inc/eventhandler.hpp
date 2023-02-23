@@ -18,14 +18,14 @@ namespace kyc
     {
         std::condition_variable &mCV;
         std::mutex &mMutex;
-        bool &msearchInterrupted;
+        bool &mSearchInterrupted;
         std::string mBufferedInput{};
         std::thread mThread{};
         char getKeyboardInput() const;
         void inputLoop();
 
     public:
-        EventHandler(std::condition_variable &cv, std::mutex &mutex, bool &searchInterrupted);
+        EventHandler(std::condition_variable &cv, std::mutex &eventMutex, bool &searchInterrupted);
         ~EventHandler();
         std::string getBufferedString() const;
     };
