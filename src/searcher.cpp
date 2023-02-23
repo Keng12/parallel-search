@@ -51,8 +51,6 @@ namespace kyc
             if (interrupted)
             {
                 std::cout << "Search interrupted; do not print results" << std::endl;
-                // Outside unique_lock, output not modified anymore after setting mSearchInterrupted
-                //output.swap(inputData); // Revert output to input if cancelled
             }
             else
             {
@@ -114,8 +112,8 @@ namespace kyc
                 kyc::vector<std::string> tmpOutput{};
                 tmpOutput.reserve(size);
                 int index{};
-                // using namespace std::chrono_literals;
-                //  std::this_thread::sleep_for(5s);
+            //    using namespace std::chrono_literals;
+            //    std::this_thread::sleep_for(3s);
                 while (true)
                 {
                     if (size == index)
