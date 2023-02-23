@@ -33,9 +33,8 @@ namespace kyc
     }
 
   public:
-    vector() : mSize{0}, mCapacity{0}, mCapacityFactor{2}
+    vector() : mSize{0}, mCapacity{0}, mCapacityFactor{2}, mArray{std::make_unique<T[]>(mCapacity)}
     {
-      mArray = std::make_unique<T[]>(mCapacity);
     }
 
     vector(const vector &input) : mSize{input.getSize()}, mCapacity{input.getSize()}, mCapacityFactor{2}
