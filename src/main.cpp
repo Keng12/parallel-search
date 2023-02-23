@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
                 }
                 std::ofstream out{filename};
                 out << ss.str();
-                std::cout << "Save results to: " << filename << std::endl;
+                std::cout << "Saved results to: " << filename << std::endl;
                 ++counter;
                 filename = basename + std::to_string(counter) + ".txt";
                 
