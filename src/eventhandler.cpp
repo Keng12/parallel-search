@@ -4,7 +4,7 @@
 
 namespace kyc
 {
-    EventHandler::EventHandler(std::condition_variable &cv, std::mutex &mutex, bool &searchCanceled) : mCV{cv}, mMutex{mutex}, mSearchCanceled{searchCanceled}
+    EventHandler::EventHandler(std::condition_variable &cv, std::mutex &mutex, bool &searchInterrupted) : mCV{cv}, mMutex{mutex}, msearchInterrupted{searchInterrupted}
     {
         mThread = std::thread{&EventHandler::inputLoop, this};
     }
@@ -27,7 +27,7 @@ namespace kyc
             {
                 std::lock_guard<std::mutex> const lock{mMutex};
                 mBufferedInput.append(input);
-                mSearchCanceled = true;
+                msearchInterrupted = true;
             }
             mCV.notify_one();
             if (input == "0" || mBufferedInput.length() >= 5)

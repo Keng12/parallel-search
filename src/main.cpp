@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
                 std::cout << "Exiting program" << std::endl;
                 break;
             }
-            else if (results->getSize() > 0 && !searcher.getSearchCanceled())
+            else if (results->getSize() > 0 && !searcher.getsearchInterrupted())
             {
                 std::stringstream ss{};
                 for (int i = 0; i < results->getSize(); ++i)
