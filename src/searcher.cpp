@@ -114,23 +114,23 @@ namespace kyc
                 kyc::vector<std::string> tmpOutput{};
                 tmpOutput.reserve(size);
                 int index{};
-                using namespace std::chrono_literals;
-                std::this_thread::sleep_for(5s);
+               // using namespace std::chrono_literals;
+              //  std::this_thread::sleep_for(5s);
                 while (true)
                 {
                     if (size == index)
                     {
 
-                        // If event handler is used: return after each check
+                        // Lock mutex only if condition is fulfilled
                         if (tmpOutput.getSize() > 0)
                         {
                             // Append to output vector if necessary
                             std::lock_guard<std::mutex> const lock{*jobMutex};
                             output_ptr->append(tmpOutput);
                         }
+                        // Always lock mutex
                         int tmpCounter{};
                         {
-                            // Increment and check total counter or return if canceled
                             std::lock_guard<std::mutex> const lock{*jobMutex};
                             *totalCounter += index;
                             tmpCounter = *totalCounter;
