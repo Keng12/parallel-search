@@ -52,7 +52,7 @@ namespace kyc
             {
                 std::cout << "Search interrupted; do not print results" << std::endl;
                 // Outside unique_lock, output not modified anymore after setting mSearchInterrupted
-                output.swap(inputData); // Revert output to input if cancelled
+                //output.swap(inputData); // Revert output to input if cancelled
             }
             else
             {
