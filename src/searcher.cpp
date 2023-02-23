@@ -114,8 +114,8 @@ namespace kyc
                 kyc::vector<std::string> tmpOutput{};
                 tmpOutput.reserve(size);
                 int index{};
-               // using namespace std::chrono_literals;
-              //  std::this_thread::sleep_for(5s);
+                // using namespace std::chrono_literals;
+                //  std::this_thread::sleep_for(5s);
                 while (true)
                 {
                     if (size == index)
@@ -137,8 +137,11 @@ namespace kyc
                         }
                         if (totalSize == tmpCounter)
                         {
-                            // Notify main thread if search finished
-                            notifyMainThread();
+                            {
+                                std::lock_guard<std::mutex> const lock{mSearchMutex};
+                                mSearchFinished = true;
+                            }
+                            mCV.notify_one();
                         }
                         return;
                     }
@@ -152,15 +155,6 @@ namespace kyc
             };
             mThreadpool.postJob(job);
         }
-    };
-    void Searcher::notifyMainThread()
-    {
-        {
-            std::lock_guard<std::mutex> const lock{mSearchMutex};
-            mSearchFinished = true;
-        }
-        mCV.notify_one();
-        return;
     }
 
     bool Searcher::getsearchInterrupted()
