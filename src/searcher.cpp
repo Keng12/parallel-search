@@ -79,11 +79,9 @@ namespace kyc
 
     void Searcher::postSearchJob(std::shared_ptr<kyc::vector<std::string>> inputData, std::shared_ptr<kyc::vector<std::string>> output_ptr)
     {
-        std::shared_ptr<std::mutex> jobMutex = std::make_shared<std::mutex>();
         const int totalSize = inputData->getSize();
         int chunkSize = totalSize / mWorkerThreads;
         int remainder = totalSize % mWorkerThreads;
-        std::shared_ptr<int> totalCounter = std::make_shared<int>();
         int nJobs{};
         if (chunkSize == 0)
         {
@@ -95,6 +93,8 @@ namespace kyc
         {
             nJobs = mWorkerThreads;
         }
+        std::shared_ptr<std::mutex> jobMutex = std::make_shared<std::mutex>();
+        std::shared_ptr<int> totalCounter = std::make_shared<int>();
         for (int i = 0; i < nJobs; ++i)
         {
             const auto job = [inputData, output_ptr, i, jobMutex, chunkSize, remainder, totalSize, totalCounter, this]()
@@ -112,8 +112,8 @@ namespace kyc
                 kyc::vector<std::string> tmpOutput{};
                 tmpOutput.reserve(size);
                 int index{};
-                //    using namespace std::chrono_literals;
-                //    std::this_thread::sleep_for(3s);
+                using namespace std::chrono_literals;
+                std::this_thread::sleep_for(3s);
                 while (true)
                 {
                     if (size == index)
