@@ -44,6 +44,7 @@ int main(int argc, char *argv[])
                 if (inputString.length() == 4)
                 {
                     std::cout << "Four characters entered; exit program" << std::endl;
+                    break;
                 }
                 else
                 {

@@ -112,8 +112,6 @@ namespace kyc
                 kyc::vector<std::string> tmpOutput{};
                 tmpOutput.reserve(size);
                 int index{};
-                using namespace std::chrono_literals;
-                std::this_thread::sleep_for(3s);
                 while (true)
                 {
                     if (size == index)
