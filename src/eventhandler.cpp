@@ -30,7 +30,7 @@ namespace kyc
                 mSearchInterrupted = true;
             }
             mCV.notify_one();
-            if (input == "0" || mBufferedInput.length() >= 5)
+            if (input == "0" || mBufferedInput.length() >= 4)
             {
                 return;
             }
