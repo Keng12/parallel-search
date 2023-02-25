@@ -1,4 +1,4 @@
-// #include<conio.h>
+#include<conio.h>
 
 #include "eventhandler.hpp"
 
@@ -20,17 +20,14 @@ namespace kyc
     {
         while (true)
         {
-            // char const input = getKeyboardInput();
-            std::string input{};
-            std::cin >> input;
-            std::cout << "Received character: " << input << std::endl;
+            char const input = getKeyboardInput();
             {
                 std::lock_guard<std::mutex> const lock{mMutex};
-                mBufferedInput.append(input);
+                mBufferedInput.append(1, input);
                 mSearchInterrupted = true;
             }
             mCV.notify_one();
-            if (input == "0" || mBufferedInput.length() >= 4)
+            if (input == '0' || mBufferedInput.length() >= 4)
             {
                 return;
             }
@@ -39,8 +36,7 @@ namespace kyc
 
     char EventHandler::getKeyboardInput() const
     {
-        char input = 'A';
-        // char input = _getch();
+        char const input = _getch();
         return input;
     }
 
