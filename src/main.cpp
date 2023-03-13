@@ -26,7 +26,6 @@ int main(int argc, char *argv[])
         {
             std::shared_ptr<kyc::vector<std::string>> results = searcher.search(data);
             std::string const inputString = searcher.getInputString();
-            std::cout << "INput string length: " << inputString.length() << std::endl;
 
             if (inputString.back() == '0' || inputString.length() >= 5)
             {
