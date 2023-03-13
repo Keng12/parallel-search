@@ -26,6 +26,8 @@ int main(int argc, char *argv[])
         {
             std::shared_ptr<kyc::vector<std::string>> results = searcher.search(data);
             std::string const inputString = searcher.getInputString();
+            std::cout << "INput string length: " << inputString.length() << std::endl;
+
             if (inputString.back() == '0' || inputString.length() >= 5)
             {
                 std::cout << "Exiting program" << std::endl;
@@ -41,16 +43,16 @@ int main(int argc, char *argv[])
                 std::ofstream out{filename};
                 out << ss.str();
                 std::cout << "Saved results to: " << filename << std::endl;
-                if (inputString.length() == 4)
-                {
-                    std::cout << "Four characters entered; exit program" << std::endl;
-                    break;
-                }
-                else
-                {
-                    ++counter;
-                    filename = basename + std::to_string(counter) + ".txt";
-                }
+            }
+            if (inputString.length() == 4)
+            {
+                std::cout << "Four characters entered; exit program" << std::endl;
+                break;
+            }
+            else
+            {
+                ++counter;
+                filename = basename + std::to_string(counter) + ".txt";
             }
             std::cout << "_____________________________________________________" << std::endl;
             data.swap(results); // Increment search -> look for subset of input data -> swap input data with output data
