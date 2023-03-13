@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.25)
+set(CMAKE_CXX_STANDARD 17)
+project (parallel-search)
+add_executable(${PROJECT_NAME})
+target_sources(${PROJECT_NAME} PRIVATE src/main.cpp src/eventhandler.cpp src/functions.cpp src/searcher.cpp src/threadpool.cpp)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/inc)
