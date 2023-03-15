@@ -20,3 +20,5 @@ Run with
 ```
 
 with `n` being the default number of threads used when searching for strings. An input data called `input.txt` will be generated and the output will be saved in separate `output<X>.txt` files with `X` being a file counter.
+
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
